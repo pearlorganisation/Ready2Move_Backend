@@ -13,3 +13,18 @@ export const USER_ROLES_ENUM = {
 };
 
 export const AVAILABLE_USER_ROLES = Object.values(USER_ROLES_ENUM);
+
+export const featureTypes = [
+  "PROPERTY_TYPE",
+  "PARKING",
+  "FURNISHING",
+  "ENTRANCE_FACING",
+  "AVAILABILITY",
+  "AGE",
+  "OWNERSHIP",
+  "AMENITIES",
+  "WATER_SOURCE",
+  "OTHER_FEATURES",
+  "FLOORING",
+  "BANKS",
+];
