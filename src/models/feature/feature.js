@@ -8,3 +8,7 @@ const featureSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+const Feature = mongoose.model("Feature", featureSchema);
+
+export default Feature;

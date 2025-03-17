@@ -12,11 +12,12 @@ const PropertySchema = new mongoose.Schema(
     subTitle: { type: String },
     description: { type: String },
     service: { type: String, enum: ["SELL", "RENT"], required: true },
-    propertyType: {
+    property: {
       type: String,
       enum: ["RESIDENTIAL", "COMMERCIAL"],
       required: true,
     },
+    propertyType: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
     // Property locaiotn
     apartmentName: { type: String }, // or society name
     apartmentNo: { type: String }, // or society no.
@@ -44,22 +45,22 @@ const PropertySchema = new mongoose.Schema(
     noOfBedrooms: { type: Number, required: true },
     noOfBathrooms: { type: Number, required: true },
     noOfBalconies: { type: Number, required: true },
-    propertyParking: { type: mongoose.Schema.Types.ObjectId, ref: "Parking" }, // Stilt parking,
+    propertyParking: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" }, // Stilt parking,
     propertyFurnishing: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Furnishing",
+      ref: "Feature",
     },
     propertyEntranceFacing: {
       //Orientation
       type: mongoose.Schema.Types.ObjectId,
-      ref: "EntranceFacing",
+      ref: "Feature",
     },
     propertyAvailability: {
       // Readyto move, underconstruction
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Availability",
+      ref: "Feature",
     },
-    propertyAge: { type: mongoose.Schema.Types.ObjectId, ref: "PropertyAge" },
+    propertyAge: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
     //     totalFloors: { type: Number, required: true },
     //     propertyOnFloor: { type: Number, required: true },
 
@@ -69,7 +70,7 @@ const PropertySchema = new mongoose.Schema(
     propertyOwnership: {
       // Free Hold
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Ownership",
+      ref: "Feature",
     },
     expectedPrice: { type: Number, required: true }, // price in bannner
     priceNegotiable: { type: Boolean, default: false },
@@ -82,20 +83,20 @@ const PropertySchema = new mongoose.Schema(
     bankOfApproval: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Bank",
+        ref: "Feature",
       },
     ],
     aminities: [String],
-    waterSource: { type: mongoose.Schema.Types.ObjectId, ref: "WaterSource" },
+    waterSource: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
     otherFeatures: {
       // Prime Location ,Good connectivity
       type: mongoose.Schema.Types.ObjectId,
-      ref: "OtherFeatures",
+      ref: "Feature",
     },
     propertyFlooring: {
       // Ceramic , Vetrified
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Flooring",
+      ref: "Feature",
     },
     //===image and yt link
     youtubeLink: { type: String },
