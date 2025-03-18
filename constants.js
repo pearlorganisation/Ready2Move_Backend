@@ -20,7 +20,7 @@ export const featureTypes = [
   "FURNISHING",
   "ENTRANCE_FACING",
   "AVAILABILITY",
-  "AGE",
+  "PROPERTY_AGE",
   "OWNERSHIP",
   "AMENITIES",
   "WATER_SOURCE",

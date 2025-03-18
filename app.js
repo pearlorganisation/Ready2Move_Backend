@@ -24,6 +24,7 @@ app.set("view engine", "ejs");
 //Routes Imports
 import authRouter from "./src/routes/auth/auth.js";
 // import { userRouter } from "./src/routes/user/user.js";
+import featureRouter from "./src/routes/feature/feature.js";
 
 app.get("/", (req, res) => {
   res.status(200).send("APIs are working...");
@@ -32,6 +33,7 @@ app.get("/", (req, res) => {
 // Routes Definitions
 app.use("/api/v1/auth", authRouter);
 // app.use("/api/v1/user", userRouter);
+app.use("/api/v1/feature", featureRouter);
 
 app.use(errorHandler);
 
