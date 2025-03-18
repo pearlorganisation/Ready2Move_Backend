@@ -1,3 +1,4 @@
+import { uploadFileToCloudinary } from "../../config/cloudinary";
 import { asyncHandler } from "../../utils/error/asyncHandler";
 
 // Create Homepage Section
