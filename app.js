@@ -7,10 +7,10 @@ const app = express();
 
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "development"
-        ? ["http://localhost:3002", "http://localhost:3001","http://localhost:3000"]
-        : ["*"],
+    origin:"http://localhost:3000",
+      // process.env.NODE_ENV === "development"
+      //   ? ["*"]
+      //   : ["*"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Specify allowed HTTP methods
     allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
     credentials: true,

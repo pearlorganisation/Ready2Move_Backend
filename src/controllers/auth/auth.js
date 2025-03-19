@@ -95,6 +95,10 @@ export const login = asyncHandler(async (req, res, next) => {
       ...COOKIE_OPTIONS,
       expires: new Date(new Date().setMonth(new Date().getMonth() + 2)), // Expires in 2 months
     })
+    .cookie("user_role", existingUser.role,{
+      ...COOKIE_OPTIONS,
+      expires:new Date(new Date().setMonth(new Date().getMonth() + 2))
+    })
     .status(200)
     .json({
       success: true,
