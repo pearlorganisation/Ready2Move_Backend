@@ -17,10 +17,10 @@ const otpSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    index: { expires: "10m" }, // TTL index for automatic deletion
   },
 });
 
+otpSchema.index({ createdAt: 1 }, { expireAfterSeconds: 300 }); // 5 minutes
 const OTP = mongoose.model("OTP", otpSchema);
 
 export default OTP;
