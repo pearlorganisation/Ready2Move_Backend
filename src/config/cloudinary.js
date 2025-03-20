@@ -16,7 +16,7 @@ export const uploadFileToCloudinary = async (files, folderName = "default") => {
     // Map each file to the upload function
     const uploadPromises = fileArray.map((file) =>
       cloudinary.uploader.upload(file.path, {
-        folder: `Pheku/${folderName}`, // Specify dynamic folder path
+        folder: `R2M/${folderName}`, // Specify dynamic folder path
       })
     );
 

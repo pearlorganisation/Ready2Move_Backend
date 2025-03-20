@@ -17,45 +17,49 @@ const projectSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    subTitle: String, //by tarasingh builders
-    description: String,
+    subTitle: { type: String }, //by tarasingh builders
+    description: { type: String },
 
-    //------------Project Location
-    //address: String,
+    //======Project Location============
     locality: String, // same as adress -"Andheri East, Mumbai, Maharashtra, India"
     city: String,
     state: String,
 
-    //------------Project Details
-    projectAreaRange: {
+    //=========roject Details==========
+    areaRange: {
       // below price range
       //Sq.Ft
       min: Number,
       max: Number,
     },
-    projectPriceRange: {
+    priceRange: {
       // shown n banner
       min: Number,
       max: Number,
     },
-    priceSqFt: Number, // show on over view
-    reraNumber: String,
+    pricePerSqFt: Number, // show on over view
+    reraNumber: { type: String },
+    availability: {
+      // Readyto move, underconstruction
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Feature",
+    },
     reraPossessionDate: { type: Date },
-    availabilityStatus: String,
-    amenities: [String],
+    aminities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     bankOfApproval: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Bank",
       },
     ],
-    //========Project Gallary
-    images: [{}], // modify this
+
+    //========Project Gallary======
+    imageGallary: [{ secure_url: String, public_id: String }], // modify this
     isFeatured: {
       type: Boolean,
       default: false,
     },
-    youtubeLink: String,
+    youtubeLink: { type: String },
   },
   {
     timestamps: true,

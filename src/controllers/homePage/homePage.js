@@ -1,7 +1,6 @@
 import { uploadFileToCloudinary } from "../../config/cloudinary";
 import { asyncHandler } from "../../utils/error/asyncHandler";
 
-// Create Homepage Section
 export const createHomepage = asyncHandler(async (req, res, next) => {
   const backgroundImage = req.file;
   let backgroundImageResponse = null;
@@ -28,7 +27,7 @@ export const createHomepage = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse("Created homepage section successfully", homepage));
 });
 
-// Get All Homepage Sections
+
 export const getAllHomepages = asyncHandler(async (req, res) => {
   const homepages = await Homepage.find();
 
@@ -39,7 +38,7 @@ export const getAllHomepages = asyncHandler(async (req, res) => {
     );
 });
 
-// Get Single Homepage Section by ID
+
 export const getHomepageById = asyncHandler(async (req, res, next) => {
   const homepage = await Homepage.findById(req.params.id);
 
@@ -52,7 +51,6 @@ export const getHomepageById = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse("Fetched homepage section successfully", homepage));
 });
 
-// Update Homepage Section
 export const updateHomepage = asyncHandler(async (req, res, next) => {
   let backgroundImageResponse = null;
 
@@ -88,7 +86,6 @@ export const updateHomepage = asyncHandler(async (req, res, next) => {
     .json(new ApiResponse("Updated homepage section successfully", homepage));
 });
 
-// Delete Homepage Section
 export const deleteHomepage = asyncHandler(async (req, res, next) => {
   const homepage = await Homepage.findByIdAndDelete(req.params.id);
 

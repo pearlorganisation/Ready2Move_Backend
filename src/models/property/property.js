@@ -86,7 +86,7 @@ const PropertySchema = new mongoose.Schema(
         ref: "Feature",
       },
     ],
-    aminities: [String],
+    aminities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     waterSource: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
     otherFeatures: {
       // Prime Location ,Good connectivity
@@ -100,7 +100,7 @@ const PropertySchema = new mongoose.Schema(
     },
     //===image and yt link
     youtubeLink: { type: String },
-    imageGallary: [{}],
+    imageGallary: [{ secure_url: String, public_id: String }],
     isFeatured: { type: Boolean, default: false },
   },
   { timestamps: true }
