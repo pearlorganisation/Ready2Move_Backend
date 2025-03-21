@@ -1,12 +1,9 @@
 import mongoose from "mongoose";
+import { youtubeRegex } from "../../utils/regexUtils.js";
 
 const PropertySchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true },
     slug: { type: String, required: true, unique: true },
     subTitle: { type: String },
@@ -18,13 +15,11 @@ const PropertySchema = new mongoose.Schema(
       required: true,
     },
     propertyType: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
-    // Property locaiotn
     apartmentName: { type: String }, // or society name
     apartmentNo: { type: String }, // or society no.
     locality: { type: String, required: true }, // on card
-    state: String,
-    city: String,
-    //================ Property Details
+    city: { type: String },
+    state: { type: String },
     area: [
       {
         name: {
@@ -40,68 +35,39 @@ const PropertySchema = new mongoose.Schema(
         },
       },
     ],
-    rera: { type: String },
+    reraNumber: { type: String },
     possession: { type: Date },
     noOfBedrooms: { type: Number, required: true },
     noOfBathrooms: { type: Number, required: true },
     noOfBalconies: { type: Number, required: true },
-    propertyParking: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" }, // Stilt parking,
-    propertyFurnishing: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Feature",
-    },
-    propertyEntranceFacing: {
-      //Orientation
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Feature",
-    },
-    propertyAvailability: {
-      // Readyto move, underconstruction
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Feature",
-    },
+    parking: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" }, // Stilt parking,
+    furnishing: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
+    entranceFacing: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" }, //Orientation from pdf
+    availability: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" }, // available from -> pdf
     propertyAge: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
-    //     totalFloors: { type: Number, required: true },
-    //     propertyOnFloor: { type: Number, required: true },
-
-    ocAvailable: { type: Boolean, default: false },
-    ccAvailable: { type: Boolean, default: false },
-    // =============price details
-    propertyOwnership: {
-      // Free Hold
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Feature",
-    },
+    isOCAvailable: { type: Boolean, default: false },
+    isCCAvailable: { type: Boolean, default: false },
+    ownership: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
     expectedPrice: { type: Number, required: true }, // price in bannner
-    priceNegotiable: { type: Boolean, default: false },
-    brokerageCharge: { type: Boolean, default: false },
-    //     brokerageType: { type: String, enum: ["FIXED", "PERCENTAGE"] },
-    //     brokerage: { type: Number, default: 0 },
-    //     brokerageNegotiable: { type: Boolean, default: false },
-
-    // ========Amenities details
-    bankOfApproval: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Feature",
-      },
-    ],
+    isPriceNegotiable: { type: Boolean, default: false },
+    isBrokerageCharge: { type: Boolean, default: false },
+    brokerage: { type: Number, default: 0 },
+    bankOfApproval: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     aminities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     waterSource: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
-    otherFeatures: {
-      // Prime Location ,Good connectivity
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Feature",
-    },
-    propertyFlooring: {
-      // Ceramic , Vetrified
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Feature",
-    },
-    //===image and yt link
-    youtubeLink: { type: String },
+    otherFeatures: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
+    propertyFlooring: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
     imageGallary: [{ secure_url: String, public_id: String }],
     isFeatured: { type: Boolean, default: false },
+    youtubeLink: {
+      type: String,
+      validate: {
+        validator: function (v) {
+          return youtubeRegex.test(v);
+        },
+        message: (props) => `${props.value} is not a valid YouTube URL!`,
+      },
+    },
   },
   { timestamps: true }
 );

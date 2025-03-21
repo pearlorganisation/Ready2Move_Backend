@@ -1,4 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
+import dotenv from "dotenv";
+import { Readable } from "stream";
+dotenv.config();
 
 // Configure Cloudinary using environment variables
 cloudinary.config({
@@ -81,3 +84,44 @@ export const deleteFileFromCloudinary = async (files) => {
     };
   }
 };
+
+// Function to handle file upload stream
+// export const uploadFileToCloudinary = async (files, folderName = "default") => {
+//   console.log("files: ", files);
+//   try {
+//     // Ensure files is always an array for uniform processing
+//     const fileArray = Array.isArray(files) ? files : [files];
+
+//     // Function to upload a single file
+//     const uploadSingleFile = (file) => {
+//       return new Promise((resolve, reject) => {
+//         const stream = cloudinary.uploader.upload_stream(
+//           { folder: `R2M/${folderName}` },
+//           (error, result) => {
+//             if (error) {
+//               reject(error);
+//             } else {
+//               resolve({
+//                 secure_url: result.secure_url,
+//                 public_id: result.public_id,
+//               });
+//             }
+//           }
+//         );
+
+//         // Convert the file buffer into a readable stream and pipe it to Cloudinary
+//         Readable.from(file.buffer).pipe(stream);
+//       });
+//     };
+
+//     // Process all file uploads
+//     const uploadResults = await Promise.all(fileArray.map(uploadSingleFile));
+//     console.log(uploadResults);
+
+//     return uploadResults;
+//   } catch (error) {
+//     throw new Error(`File upload failed: ${error.message}`);
+//   }
+// };
+
+//Using upload_stream as data coming in buffer and we are not saving file to local disk
