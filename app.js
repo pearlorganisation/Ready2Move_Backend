@@ -23,6 +23,8 @@ app.set("view engine", "ejs");
 
 //Routes Imports
 import authRouter from "./src/routes/auth/auth.js";
+import faqRouter from "./src/routes/faq/faq.js";
+import blogRouter from "./src/routes/blog/blog.js";
 // import { userRouter } from "./src/routes/user/user.js";
 
 app.get("/", (req, res) => {
@@ -32,6 +34,9 @@ app.get("/", (req, res) => {
 // Routes Definitions
 app.use("/api/v1/auth", authRouter);
 // app.use("/api/v1/user", userRouter);
+app.use("/api/v1/faq" , faqRouter)
+app.use("/api/v1/blog" , blogRouter)
+
 
 app.use(errorHandler);
 
