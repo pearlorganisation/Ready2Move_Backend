@@ -1,20 +1,21 @@
 import mongoose from "mongoose";
 import { youtubeRegex } from "../../utils/regexUtils.js";
 
-const PropertySchema = new mongoose.Schema(
+const propertySchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    title: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
+    title: { type: String, required: true, unique: true, trim: true },
+    slug: { type: String, required: true, unique: true, trim: true },
     subTitle: { type: String },
     description: { type: String },
-    service: { type: String, enum: ["SELL", "RENT"], required: true },
+    service: { type: String, enum: ["SELL", "RENT"], required: true }, // search for property
     property: {
+      // search for property
       type: String,
       enum: ["RESIDENTIAL", "COMMERCIAL"],
       required: true,
     },
-    propertyType: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
+    propertyType: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" }, // search for property
     apartmentName: { type: String }, // or society name
     apartmentNo: { type: String }, // or society no.
     locality: { type: String, required: true }, // on card
@@ -72,4 +73,6 @@ const PropertySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Property", PropertySchema);
+const Property = mongoose.model("Property", propertySchema);
+
+export default Property;
