@@ -2,7 +2,6 @@ import { buildFeaturePipeline } from "../../helpers/aggregationPipelines.js";
 import Feature from "../../models/feature/feature.js";
 import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
-import { paginate } from "../../utils/pagination.js";
 
 export const createFeature = asyncHandler(async (req, res, next) => {
   const { name, type } = req.body;
