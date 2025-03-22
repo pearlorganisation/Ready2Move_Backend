@@ -61,7 +61,22 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
   const { data: projects, pagination } = await paginate(
     Project,
     parseInt(page),
-    parseInt(limit)
+    parseInt(limit),
+    {},
+    [
+      {
+        path: "availability",
+        select: "name type",
+      },
+      {
+        path: "aminities",
+        select: "name type",
+      },
+      {
+        path: "bankOfApproval",
+        select: "name type",
+      },
+    ]
   );
 
   if (!projects || projects.length === 0) {
