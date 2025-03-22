@@ -2,7 +2,7 @@ import express from "express";
 import {
   createProject,
   getAllProjects,
-  getProjectById,
+  getProjectBySlug,
 } from "../../controllers/project/project.js";
 import { upload } from "../../middlewares/multer.js";
 import {
@@ -23,6 +23,6 @@ router
     createProject
   );
 
-router.route("/:id").get(getProjectById);
+router.route("/:slug").get(getProjectBySlug);
 
 export default router;

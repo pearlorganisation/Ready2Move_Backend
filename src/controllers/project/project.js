@@ -38,8 +38,8 @@ export const createProject = asyncHandler(async (req, res, next) => {
   });
 });
 
-export const getProjectById = asyncHandler(async (req, res, next) => {
-  const project = await Project.findById(req.params.id).populate([
+export const getProjectBySlug = asyncHandler(async (req, res, next) => {
+  const project = await Project.findOne({ slug: req.params?.slug }).populate([
     { path: "availability", select: "name type" },
     { path: "aminities", select: "name type" },
     { path: "bankOfApproval", select: "name type" },
