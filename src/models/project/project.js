@@ -4,8 +4,8 @@ import { youtubeRegex } from "../../utils/regexUtils.js";
 const projectSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    title: { type: String, required: true, trim: true },
-    slug: { type: String, required: true, unique: true },
+    title: { type: String, required: true, unique: true, trim: true },
+    slug: { type: String, required: true, unique: true, trim: true },
     subTitle: { type: String },
     description: { type: String },
     locality: { type: String },
