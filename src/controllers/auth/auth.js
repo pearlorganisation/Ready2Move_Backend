@@ -144,3 +144,10 @@ export const login = asyncHandler(async (req, res, next) => {
       user: sanitizedUser,
     });
 });
+
+export const logout = asyncHandler(async (req, res, next) => {
+  res
+    .clearCookie("access_token", COOKIE_OPTIONS)
+    .status(200)
+    .json({ success: true, message: "Logout Successfull" });
+});
