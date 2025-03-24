@@ -35,7 +35,20 @@ const projectSchema = new mongoose.Schema(
     reraPossessionDate: { type: Date, required: true },
     aminities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     bankOfApproval: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
-    imageGallary: [{ secure_url: String, public_id: String }],
+    imageGallery: {
+      type: [
+        {
+          secure_url: { type: String, required: true },
+          public_id: { type: String, required: true },
+        },
+      ],
+      validate: {
+        validator: function (images) {
+          return images.length <= 8; // Maximum 8 images allowed
+        },
+        message: "You cannot upload more than 8 images.",
+      },
+    },
     isFeatured: { type: Boolean, default: false },
     youtubeEmbedLink: { type: String },
   },

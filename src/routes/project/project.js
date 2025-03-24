@@ -20,15 +20,15 @@ router
   .get(getAllProjects)
   .post(
     authenticateToken,
-    verifyPermission([USER_ROLES_ENUM.BUILDER]),
-    upload.array("imageGallary", 10),
+    verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),
+    upload.array("imageGallery", 8),
     createProject
   );
 
 router
   .route("/:slug")
   .get(getProjectBySlug)
-  .patch(upload.array("imageGallary", 10), updateProjectBySlug);
+  .patch(upload.array("imageGallery", 8), updateProjectBySlug);
 
 router.route("/:id").delete(deleteProjectById);
 

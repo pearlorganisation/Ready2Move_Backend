@@ -8,12 +8,12 @@ import { asyncHandler } from "../../utils/error/asyncHandler.js";
 import { paginate } from "../../utils/pagination.js";
 
 export const createProject = asyncHandler(async (req, res, next) => {
-  const imageGallary = req.files; // [{}, {}]
-  let imageGallaryResponse = null;
+  const imageGallery = req.files; // [{}, {}]
+  let imageGalleryResponse = null;
 
-  if (imageGallary) {
-    imageGallaryResponse = await uploadFileToCloudinary(
-      imageGallary,
+  if (imageGallery) {
+    imageGalleryResponse = await uploadFileToCloudinary(
+      imageGallery,
       "Project"
     );
   }
@@ -26,7 +26,7 @@ export const createProject = asyncHandler(async (req, res, next) => {
     aminities: req.body.aminities && JSON.parse(req.body.aminities),
     bankOfApproval:
       req.body.bankOfApproval && JSON.parse(req.body.bankOfApproval),
-    imageGallary: imageGallaryResponse.length > 0 ? imageGallaryResponse : [],
+    imageGallery: imageGalleryResponse.length > 0 ? imageGalleryResponse : [],
   });
 
   if (!project) {
@@ -97,8 +97,8 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
 export const updateProjectBySlug = asyncHandler(async (req, res, next) => {
   let { deleteImages, ...otherFields } = req.body;
 
-  const imageGallary = req.files;
-  let imageGallaryResponse = null;
+  const imageGallery = req.files;
+  let imageGalleryResponse = null;
 
   // Find the project first
   const project = await Project.findOne({ slug: req.params?.slug });
@@ -120,9 +120,9 @@ export const updateProjectBySlug = asyncHandler(async (req, res, next) => {
   }
 
   // Step 2: Upload new images
-  if (imageGallary) {
-    imageGallaryResponse = await uploadFileToCloudinary(
-      imageGallary,
+  if (imageGallery) {
+    imageGalleryResponse = await uploadFileToCloudinary(
+      imageGallery,
       "Project"
     );
   }
@@ -136,18 +136,18 @@ export const updateProjectBySlug = asyncHandler(async (req, res, next) => {
       updateOne: {
         filter: { slug: req.params?.slug },
         update: {
-          $pull: { imageGallary: { public_id: { $in: deleteImages } } },
+          $pull: { imageGallery: { public_id: { $in: deleteImages } } },
         },
       },
     });
   }
 
   // Add new images to MongoDB
-  if (imageGallaryResponse?.length > 0) {
+  if (imageGalleryResponse?.length > 0) {
     bulkOperations.push({
       updateOne: {
         filter: { slug: req.params?.slug },
-        update: { $push: { imageGallary: { $each: imageGallaryResponse } } },
+        update: { $push: { imageGallery: { $each: imageGalleryResponse } } },
       },
     });
   }
@@ -198,8 +198,8 @@ export const deleteProjectById = asyncHandler(async (req, res, next) => {
   if (!project) {
     return next(new ApiError("Project not found", 404));
   }
-  if (project?.imageGallary)
-    await deleteFileFromCloudinary(project.imageGallary);
+  if (project?.imageGallery)
+    await deleteFileFromCloudinary(project.imageGallery);
   return res
     .status(200)
     .json({ success: true, message: "Deleted the Project successfully" });

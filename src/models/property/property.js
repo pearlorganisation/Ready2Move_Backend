@@ -40,7 +40,7 @@ const propertySchema = new mongoose.Schema(
       },
     ],
     reraNumber: { type: String, required: true },
-    possession: { type: Date, required: true },
+    reraPossessionDate: { type: Date, required: true },
     noOfBedrooms: { type: Number, required: true },
     noOfBathrooms: { type: Number, required: true },
     noOfBalconies: { type: Number, required: true },
@@ -85,7 +85,20 @@ const propertySchema = new mongoose.Schema(
     waterSource: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
     otherFeatures: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     propertyFlooring: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
-    imageGallary: [{ secure_url: String, public_id: String }],
+    imageGallery: {
+      type: [
+        {
+          secure_url: { type: String, required: true },
+          public_id: { type: String, required: true },
+        },
+      ],
+      validate: {
+        validator: function (images) {
+          return images.length <= 8; // Maximum 8 images allowed
+        },
+        message: "You cannot upload more than 8 images.",
+      },
+    },
     isFeatured: { type: Boolean, default: false },
     youtubeEmbedLink: { type: String },
   },
