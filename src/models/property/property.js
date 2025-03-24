@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { youtubeRegex } from "../../utils/regexUtils.js";
 
 const propertySchema = new mongoose.Schema(
   {
@@ -88,15 +87,7 @@ const propertySchema = new mongoose.Schema(
     propertyFlooring: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
     imageGallary: [{ secure_url: String, public_id: String }],
     isFeatured: { type: Boolean, default: false },
-    youtubeLink: {
-      type: String,
-      validate: {
-        validator: function (v) {
-          return youtubeRegex.test(v);
-        },
-        message: (props) => `${props.value} is not a valid YouTube URL!`,
-      },
-    },
+    youtubeEmbedLink: { type: String },
   },
   { timestamps: true }
 );

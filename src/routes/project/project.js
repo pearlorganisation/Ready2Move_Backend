@@ -1,8 +1,10 @@
 import express from "express";
 import {
   createProject,
+  deleteProjectById,
   getAllProjects,
   getProjectBySlug,
+  updateProjectBySlug,
 } from "../../controllers/project/project.js";
 import { upload } from "../../middlewares/multer.js";
 import {
@@ -23,6 +25,11 @@ router
     createProject
   );
 
-router.route("/:slug").get(getProjectBySlug);
+router
+  .route("/:slug")
+  .get(getProjectBySlug)
+  .patch(upload.array("imageGallary", 10), updateProjectBySlug);
+
+router.route("/:id").delete(deleteProjectById);
 
 export default router;

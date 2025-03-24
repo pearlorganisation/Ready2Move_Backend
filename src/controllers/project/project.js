@@ -1,4 +1,7 @@
-import { uploadFileToCloudinary } from "../../config/cloudinary.js";
+import {
+  deleteFileFromCloudinary,
+  uploadFileToCloudinary,
+} from "../../config/cloudinary.js";
 import Project from "../../models/project/project.js";
 import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
@@ -14,7 +17,6 @@ export const createProject = asyncHandler(async (req, res, next) => {
       "Project"
     );
   }
-
   const project = await Project.create({
     user: req.user._id,
     ...req.body,
@@ -24,7 +26,7 @@ export const createProject = asyncHandler(async (req, res, next) => {
     aminities: req.body.aminities && JSON.parse(req.body.aminities),
     bankOfApproval:
       req.body.bankOfApproval && JSON.parse(req.body.bankOfApproval),
-    imageGallary: (imageGallaryResponse && imageGallaryResponse[0]) || null,
+    imageGallary: imageGallaryResponse.length > 0 ? imageGallaryResponse : [],
   });
 
   if (!project) {
@@ -89,4 +91,116 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
     pagination,
     data: projects,
   });
+});
+
+// Can add images and delete images independently and together too
+export const updateProjectBySlug = asyncHandler(async (req, res, next) => {
+  let { deleteImages, ...otherFields } = req.body;
+
+  const imageGallary = req.files;
+  let imageGallaryResponse = null;
+
+  // Find the project first
+  const project = await Project.findOne({ slug: req.params?.slug });
+
+  if (!project) {
+    return next(new ApiError("Project not found", 404));
+  }
+  if (!Array.isArray(deleteImages)) {
+    deleteImages = deleteImages ? [deleteImages] : []; // Convert to array or default to an empty array
+  }
+  // Filter out empty values
+  const validDeleteImages = deleteImages.filter((img) => img.trim() !== "");
+
+  // Step 1: Delete images only if there are valid ones
+  if (validDeleteImages.length > 0) {
+    for (const image of validDeleteImages) {
+      await deleteFileFromCloudinary({ public_id: image });
+    }
+  }
+
+  // Step 2: Upload new images
+  if (imageGallary) {
+    imageGallaryResponse = await uploadFileToCloudinary(
+      imageGallary,
+      "Project"
+    );
+  }
+
+  // Step 3: Create bulkWrite operations
+  const bulkOperations = [];
+
+  // Delete images from MongoDB
+  if (deleteImages?.length > 0) {
+    bulkOperations.push({
+      updateOne: {
+        filter: { slug: req.params?.slug },
+        update: {
+          $pull: { imageGallary: { public_id: { $in: deleteImages } } },
+        },
+      },
+    });
+  }
+
+  // Add new images to MongoDB
+  if (imageGallaryResponse?.length > 0) {
+    bulkOperations.push({
+      updateOne: {
+        filter: { slug: req.params?.slug },
+        update: { $push: { imageGallary: { $each: imageGallaryResponse } } },
+      },
+    });
+  }
+
+  // Update other fields in MongoDB
+  if (Object.keys(otherFields).length > 0) {
+    bulkOperations.push({
+      updateOne: {
+        filter: { slug: req.params?.slug },
+        update: {
+          $set: {
+            ...otherFields,
+            areaRange:
+              otherFields.areaRange && JSON.parse(otherFields.areaRange),
+            priceRange:
+              otherFields.priceRange && JSON.parse(otherFields.priceRange),
+            availability:
+              otherFields.availability && JSON.parse(otherFields.availability),
+            aminities:
+              otherFields.aminities && JSON.parse(otherFields.aminities),
+            bankOfApproval:
+              otherFields.bankOfApproval &&
+              JSON.parse(otherFields.bankOfApproval),
+          },
+        },
+      },
+    });
+  }
+
+  // Execute bulkWrite only if there are operations
+  if (bulkOperations.length > 0) {
+    await Project.bulkWrite(bulkOperations);
+  }
+
+  // Fetch the updated project
+  const updatedProject = await Project.findOne({ slug: req.params?.slug });
+
+  return res.status(200).json({
+    success: true,
+    message: "Updated the Project successfully",
+    data: updatedProject,
+  });
+});
+
+export const deleteProjectById = asyncHandler(async (req, res, next) => {
+  const project = await Project.findByIdAndDelete(req.params.id);
+
+  if (!project) {
+    return next(new ApiError("Project not found", 404));
+  }
+  if (project?.imageGallary)
+    await deleteFileFromCloudinary(project.imageGallary);
+  return res
+    .status(200)
+    .json({ success: true, message: "Deleted the Project successfully" });
 });
