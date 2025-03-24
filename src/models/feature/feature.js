@@ -3,8 +3,8 @@ import { featureTypes } from "../../../constants.js";
 
 const featureSchema = new mongoose.Schema(
   {
-    name: { type: String },
-    type: { type: String, enum: featureTypes }, // Property type, Parking
+    name: { type: String, required: true, unique: true },
+    type: { type: String, required: true, enum: featureTypes },
   },
   { timestamps: true }
 );
