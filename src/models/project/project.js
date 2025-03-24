@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import { youtubeRegex } from "../../utils/regexUtils.js";
 
 const projectSchema = new mongoose.Schema(
   {
@@ -11,6 +10,13 @@ const projectSchema = new mongoose.Schema(
     locality: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
+    service: { type: String, enum: ["SELL", "RENT"], required: true }, // search for project
+    projectType: {
+      // search for property
+      type: String,
+      enum: ["RESIDENTIAL", "COMMERCIAL"],
+      required: true,
+    },
     areaRange: {
       min: { type: Number, required: true },
       max: { type: Number, required: true },
@@ -31,15 +37,7 @@ const projectSchema = new mongoose.Schema(
     bankOfApproval: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     imageGallary: [{ secure_url: String, public_id: String }],
     isFeatured: { type: Boolean, default: false },
-    youtubeLink: {
-      type: String,
-      validate: {
-        validator: function (v) {
-          return youtubeRegex.test(v);
-        },
-        message: (props) => `${props.value} is not a valid YouTube URL!`,
-      },
-    },
+    youtubeLink: { type: String },
   },
   {
     timestamps: true,
