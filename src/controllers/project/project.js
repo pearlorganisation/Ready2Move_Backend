@@ -93,7 +93,7 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
   });
 });
 
-// Can add images and delete images independently and together too
+// Can add images and delete images independently and simultaneously too
 export const updateProjectBySlug = asyncHandler(async (req, res, next) => {
   let { deleteImages, ...otherFields } = req.body;
 

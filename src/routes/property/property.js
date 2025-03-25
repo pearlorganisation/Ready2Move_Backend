@@ -1,5 +1,11 @@
 import express from "express";
-import { createProperty } from "../../controllers/property/property.js";
+import {
+  createProperty,
+  deletePropertyById,
+  getAllProperties,
+  getPropertyBySlug,
+  updatePropertyBySlug,
+} from "../../controllers/property/property.js";
 import {
   authenticateToken,
   verifyPermission,
@@ -21,6 +27,35 @@ router
     ]),
     upload.array("imageGallery", 8),
     createProperty
+  )
+  .get(getAllProperties);
+
+router
+  .route("/:slug")
+  .get(getPropertyBySlug)
+  .patch(
+    authenticateToken,
+    verifyPermission([
+      USER_ROLES_ENUM.ADMIN,
+      USER_ROLES_ENUM.BUILDER,
+      USER_ROLES_ENUM.AGENT,
+      USER_ROLES_ENUM.USER,
+    ]),
+    upload.array("imageGallery", 8),
+    updatePropertyBySlug
+  );
+
+router
+  .route("/:id")
+  .delete(
+    authenticateToken,
+    verifyPermission([
+      USER_ROLES_ENUM.ADMIN,
+      USER_ROLES_ENUM.BUILDER,
+      USER_ROLES_ENUM.AGENT,
+      USER_ROLES_ENUM.USER,
+    ]),
+    deletePropertyById
   );
 
 export default router;
