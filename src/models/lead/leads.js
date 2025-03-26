@@ -18,11 +18,14 @@ const leadSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      match: [/^\+?[1-9]\d{9,14}$/, "Please enter a valid phone number"],
     },
     message: {
       type: String,
       required: true,
       trim: true,
+      minlength: 10, // Minimum 10 characters
+      maxlength: 500, // Maximum 500 characters
     },
     assignedTo: {
       type: mongoose.Schema.Types.ObjectId,
@@ -49,6 +52,25 @@ const leadSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Single validation logic in a pre-save middleware
+leadSchema.pre("validate", function (next) {
+  if (this.project && this.property) {
+    return next(
+      new Error(
+        "A lead can be associated with either a project or a property, but not both."
+      )
+    );
+  }
+  if (!this.project && !this.property) {
+    return next(
+      new Error(
+        "A lead must be associated with either a project or a property."
+      )
+    );
+  }
+  next();
+});
 
 const Lead = mongoose.model("Lead", leadSchema);
 export default Lead;
