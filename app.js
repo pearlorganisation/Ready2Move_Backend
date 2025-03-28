@@ -35,6 +35,7 @@ import bannerRouter from "./src/routes/banner/banner.js";
 import projectRouter from "./src/routes/project/project.js";
 import propertyRouter from "./src/routes/property/property.js";
 import leadRouter from "./src/routes/lead/leads.js";
+import dashboardRouter from "./src/routes/dashboard/dashoard.js";
 
 app.get("/", (req, res) => {
   res.status(200).send("APIs are working...");
@@ -42,6 +43,7 @@ app.get("/", (req, res) => {
 
 // Routes Definitions
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/dashboard", dashboardRouter);
 app.use("/api/v1/features", featureRouter);
 app.use("/api/v1/banners", bannerRouter);
 app.use("/api/v1/projects", projectRouter);
