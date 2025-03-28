@@ -37,6 +37,7 @@ const leadSchema = new mongoose.Schema(
       default: "PENDING",
     },
     feedBack: {
+      // add validation
       type: String,
     },
     project: {

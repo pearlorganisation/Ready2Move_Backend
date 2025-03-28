@@ -55,55 +55,32 @@ export const getAllLeads = asyncHandler(async (req, res, next) => {
   });
 });
 
-// export const updateLeadById = asyncHandler(async (req, res, next) => {
-//   const {
-//     name,
-//     email,
-//     phoneNumber,
-//     message,
-//     assignedTo,
-//     status,
-//     feedBack,
-//     project,
-//     property,
-//   } = req.body;
+export const updateLeadById = asyncHandler(async (req, res, next) => {
+  const lead = await Lead.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
 
-//   const lead = await Lead.findByIdAndUpdate(
-//     req.params.id,
-//     {
-//       name,
-//       email,
-//       phoneNumber,
-//       message,
-//       assignedTo,
-//       status,
-//       feedBack,
-//       project,
-//       property,
-//     },
-//     { new: true, runValidators: true }
-//   );
+  if (!lead) {
+    return next(new ApiError("Failed to update the Lead", 404));
+  }
 
-//   if (!lead) {
-//     return next(new ApiError("Failed to update the Lead", 404));
-//   }
+  return res.status(200).json({
+    success: true,
+    message: "Updated the Lead successfully",
+    data: lead,
+  });
+});
 
-//   return res.status(200).json({
-//     success: true,
-//     message: "Updated the Lead successfully",
-//     data: lead,
-//   });
-// });
+export const deleteLeadById = asyncHandler(async (req, res, next) => {
+  const lead = await Lead.findByIdAndDelete(req.params.id);
 
-// export const deleteLeadById = asyncHandler(async (req, res, next) => {
-//   const lead = await Lead.findByIdAndDelete(req.params.id);
+  if (!lead) {
+    return next(new ApiError("Lead not found", 404));
+  }
 
-//   if (!lead) {
-//     return next(new ApiError("Lead not found", 404));
-//   }
-
-//   return res.status(200).json({
-//     success: true,
-//     message: "Deleted the Lead successfully",
-//   });
-// });
+  return res.status(200).json({
+    success: true,
+    message: "Deleted the Lead successfully",
+  });
+});
