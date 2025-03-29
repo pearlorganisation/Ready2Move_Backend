@@ -16,6 +16,7 @@ export const createProperty = asyncHandler(async (req, res, next) => {
       imageGallery,
       "Property"
     );
+    
   }
 
   const property = await Property.create({
