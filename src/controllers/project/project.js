@@ -6,27 +6,44 @@ import Project from "../../models/project/project.js";
 import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
 import { paginate } from "../../utils/pagination.js";
-
+import mongoose from "mongoose";
 export const createProject = asyncHandler(async (req, res, next) => {
-  const imageGallery = req.files; // [{}, {}]
-  let imageGalleryResponse = null;
+  console.log("Requested body is:", req.body);
 
-  if (imageGallery) {
-    imageGalleryResponse = await uploadFileToCloudinary(
-      imageGallery,
-      "Project"
-    );
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ success: false, message: "No images uploaded" });
   }
+
+  let imageGalleryResponse = await uploadFileToCloudinary(req.files, "Project");
+  let imageGallery = imageGalleryResponse.map(img => ({
+    public_id: img.public_id, 
+    secure_url: img.secure_url
+  }));
+  // ✅ Correct format
+
   const project = await Project.create({
-    user: req.user._id,
-    ...req.body,
-    areaRange: req.body.areaRange && JSON.parse(req.body.areaRange),
-    priceRange: req.body.priceRange && JSON.parse(req.body.priceRange),
-    availability: req.body.availability && JSON.parse(req.body.availability),
-    aminities: req.body.aminities && JSON.parse(req.body.aminities),
-    bankOfApproval:
-      req.body.bankOfApproval && JSON.parse(req.body.bankOfApproval),
-    imageGallery: imageGalleryResponse.length > 0 ? imageGalleryResponse : [],
+    user: req.body.user,
+    title: req.body.title,
+    slug: req.body.slug,
+    subTitle: req.body.subTitle,
+    description: req.body.description,
+    locality: req.body.locality,
+    city: req.body.city,
+    state: req.body.state,
+    service: req.body.service,
+    projectType: req.body.projectType,
+    reraPossessionDate: req.body.reraPossessionDate,
+    reraNumber: req.body.reraNumber,
+    'areaRange.min': req.body.areaRange.min,
+    'areaRange.max': req.body.areaRange.max,
+    'priceRange.min': req.body.priceRange.min,
+    'priceRange.max': req.body.priceRange.max,
+    availability: req.body.availability,
+    aminities: req.body.aminities?.map(id => new mongoose.Types.ObjectId(id)),
+    pricePerSqFt: req.body.pricePerSqFt,
+    bankOfApproval: req.body.bankOfApproval,
+    imageGallery, // ✅ Fixed spelling
+    youtubeLink: req.body.youtubeLink
   });
 
   if (!project) {

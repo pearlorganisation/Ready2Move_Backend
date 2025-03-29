@@ -7,6 +7,7 @@ import { generateOTP } from "../../utils/otpUtils.js";
 import { COOKIE_OPTIONS } from "../../../constants.js";
 
 export const register = asyncHandler(async (req, res, next) => {
+  console.log(req.body)
   const { email, name } = req?.body;
   const existingUser = await User.findOne({ email });
   const otp = generateOTP();
