@@ -6,6 +6,7 @@ import Project from "../../models/project/project.js";
 import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
 import { paginate } from "../../utils/pagination.js";
+import { safeParse } from "../../utils/safeParse.js";
 
 export const createProject = asyncHandler(async (req, res, next) => {
   const imageGallery = req.files; // [{}, {}]
@@ -20,12 +21,11 @@ export const createProject = asyncHandler(async (req, res, next) => {
   const project = await Project.create({
     user: req.user._id,
     ...req.body,
-    areaRange: req.body.areaRange && JSON.parse(req.body.areaRange),
-    priceRange: req.body.priceRange && JSON.parse(req.body.priceRange),
-    availability: req.body.availability && JSON.parse(req.body.availability),
-    aminities: req.body.aminities && JSON.parse(req.body.aminities),
-    bankOfApproval:
-      req.body.bankOfApproval && JSON.parse(req.body.bankOfApproval),
+    areaRange: safeParse(req.body.areaRange),
+    priceRange: safeParse(req.body.priceRange),
+    availability: safeParse(req.body.availability),
+    aminities: safeParse(req.body.aminities),
+    bankOfApproval: safeParse(req.body.bankOfApproval),
     imageGallery: imageGalleryResponse.length > 0 ? imageGalleryResponse : [],
   });
 

@@ -6,11 +6,11 @@ import Property from "../../models/property/property.js";
 import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
 import { paginate } from "../../utils/pagination.js";
+import { safeParse } from "../../utils/safeParse.js";
 
 export const createProperty = asyncHandler(async (req, res, next) => {
   const imageGallery = req.files;
   let imageGalleryResponse = null;
-  console.log(req.body);
   if (imageGallery) {
     imageGalleryResponse = await uploadFileToCloudinary(
       imageGallery,
@@ -21,11 +21,10 @@ export const createProperty = asyncHandler(async (req, res, next) => {
   const property = await Property.create({
     user: req.user._id,
     ...req.body,
-    area: req.body.area && JSON.parse(req.body.area),
-    bankOfApproval:
-      req.body.bankOfApproval && JSON.parse(req.body.bankOfApproval),
-    aminities: req.body.aminities && JSON.parse(req.body.aminities),
-    otherFeatures: req.body.otherFeatures && JSON.parse(req.body.otherFeatures),
+    area: safeParse(req.body.area),
+    bankOfApproval: safeParse(req.body.bankOfApproval),
+    aminities: safeParse(req.body.aminities),
+    otherFeatures: safeParse(req.body.otherFeatures),
     imageGallery: imageGalleryResponse?.length > 0 ? imageGalleryResponse : [],
   });
 
