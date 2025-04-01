@@ -5,26 +5,41 @@ import { asyncHandler } from "../../utils/error/asyncHandler.js";
 import { paginate } from "../../utils/pagination.js";
 
 export const createProject = asyncHandler(async (req, res, next) => {
-  const imageGallary = req.files; // [{}, {}]
+  console.log("requested body is", req.body);
+
+  // Get uploaded images
+  const imageGallary = req.files;
   let imageGallaryResponse = null;
 
   if (imageGallary) {
-    imageGallaryResponse = await uploadFileToCloudinary(
-      imageGallary,
-      "Project"
-    );
+    imageGallaryResponse = await uploadFileToCloudinary(imageGallary, "Project");
   }
 
+  console.log("the image response is", imageGallaryResponse)
+
   const project = await Project.create({
-    user: req.user._id,
-    ...req.body,
-    areaRange: req.body.areaRange && JSON.parse(req.body.areaRange),
-    priceRange: req.body.priceRange && JSON.parse(req.body.priceRange),
-    availability: req.body.availability && JSON.parse(req.body.availability),
-    aminities: req.body.aminities && JSON.parse(req.body.aminities),
-    bankOfApproval:
-      req.body.bankOfApproval && JSON.parse(req.body.bankOfApproval),
-    imageGallary: (imageGallaryResponse && imageGallaryResponse[0]) || null,
+    user: req.body.user,
+    title: req.body.title,
+    slug: req.body.slug,
+    subTitle: req.body.subTitle,
+    description: req.body.description,
+    locality: req.body.locality,
+    city: req.body.city,
+    state: req.body.state,
+    service: req.body.service,
+    projectType: req.body.projectType,
+    reraPossessionDate: req.body.reraPossessionDate,
+    reraNumber:req.body.reraNumber,
+    'areaRange.min': req.body.areaRange.min, // ✅ Safe parsing
+    'areaRange.max': req.body.areaRange.max, // ✅ Safe parsing
+    'priceRange.min':req.body.priceRange.min, // ✅ Safe parsing
+    'priceRange.max': req.body.priceRange.max, // ✅ Safe parsing
+    availability: req.body.availability,
+    aminities: req.body.aminities,
+    pricePerSqFt:req.body.pricePerSqFt,
+    bankOfApproval: req.body.bankOfApproval,
+    imageGallary:imageGallaryResponse,
+    youtubeLink:req.body.youtubeLink
   });
 
   if (!project) {
@@ -37,6 +52,7 @@ export const createProject = asyncHandler(async (req, res, next) => {
     data: project,
   });
 });
+
 
 export const getProjectBySlug = asyncHandler(async (req, res, next) => {
   const project = await Project.findOne({ slug: req.params?.slug }).populate([

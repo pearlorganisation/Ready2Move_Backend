@@ -36,6 +36,7 @@ const projectSchema = new mongoose.Schema(
     aminities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     bankOfApproval: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     imageGallary: [{ secure_url: String, public_id: String }],
+    
     isFeatured: { type: Boolean, default: false },
     youtubeLink: { type: String },
   },
