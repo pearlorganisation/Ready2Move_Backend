@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { errorHandler } from "./src/middlewares/errorHandler.js";
 
@@ -18,6 +19,7 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(morgan("dev"));
 app.set("view engine", "ejs");
 
@@ -26,6 +28,7 @@ import authRouter from "./src/routes/auth/auth.js";
 // import { userRouter } from "./src/routes/user/user.js";
 import featureRouter from "./src/routes/feature/feature.js";
 import bannerRouter from "./src/routes/banner/banner.js";
+import projectRouter from "./src/routes/project/project.js";
 
 app.get("/", (req, res) => {
   res.status(200).send("APIs are working...");
@@ -35,6 +38,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/features", featureRouter);
 app.use("/api/v1/banners", bannerRouter);
+app.use("/api/v1/projects", projectRouter);
 
 app.use(errorHandler);
 

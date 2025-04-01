@@ -1,25 +1,30 @@
 import mongoose from "mongoose";
 import { youtubeRegex } from "../../utils/regexUtils.js";
 
-const PropertySchema = new mongoose.Schema(
+const propertySchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-    title: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
+    title: { type: String, required: true, unique: true, trim: true },
+    slug: { type: String, required: true, unique: true, trim: true },
     subTitle: { type: String },
-    description: { type: String },
-    service: { type: String, enum: ["SELL", "RENT"], required: true },
+    description: { type: String, required: true },
+    service: { type: String, enum: ["SELL", "RENT"], required: true }, // search for property
     property: {
+      // search for property
       type: String,
       enum: ["RESIDENTIAL", "COMMERCIAL"],
       required: true,
     },
-    propertyType: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
-    apartmentName: { type: String }, // or society name
-    apartmentNo: { type: String }, // or society no.
+    propertyType: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Feature",
+      required: true,
+    }, // search for property
+    apartmentName: { type: String, required: true }, // or society name
+    apartmentNo: { type: String, required: true }, // or society no.
     locality: { type: String, required: true }, // on card
-    city: { type: String },
-    state: { type: String },
+    city: { type: String, required: true },
+    state: { type: String, required: true },
     area: [
       {
         name: {
@@ -35,19 +40,43 @@ const PropertySchema = new mongoose.Schema(
         },
       },
     ],
-    reraNumber: { type: String },
-    possession: { type: Date },
+    reraNumber: { type: String, required: true },
+    possession: { type: Date, required: true },
     noOfBedrooms: { type: Number, required: true },
     noOfBathrooms: { type: Number, required: true },
     noOfBalconies: { type: Number, required: true },
-    parking: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" }, // Stilt parking,
-    furnishing: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
-    entranceFacing: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" }, //Orientation from pdf
-    availability: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" }, // available from -> pdf
-    propertyAge: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
+    parking: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Feature",
+      required: true,
+    }, // Stilt parking,
+    furnishing: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Feature",
+      required: true,
+    },
+    entranceFacing: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Feature",
+      required: true,
+    }, //Orientation from pdf
+    availability: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Feature",
+      required: true,
+    }, // available from -> pdf
+    propertyAge: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Feature",
+      required: true,
+    },
     isOCAvailable: { type: Boolean, default: false },
     isCCAvailable: { type: Boolean, default: false },
-    ownership: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
+    ownership: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Feature",
+      required: true,
+    },
     expectedPrice: { type: Number, required: true }, // price in bannner
     isPriceNegotiable: { type: Boolean, default: false },
     isBrokerageCharge: { type: Boolean, default: false },
@@ -72,4 +101,6 @@ const PropertySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Property", PropertySchema);
+const Property = mongoose.model("Property", propertySchema);
+
+export default Property;
