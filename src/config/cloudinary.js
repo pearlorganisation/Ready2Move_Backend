@@ -38,11 +38,10 @@ export const uploadFileToCloudinary = async (files, folderName = "default") => {
 };
 
 export const deleteFileFromCloudinary = async (files) => {
-  console.log("filess sdjfsdjfskldjfdklsjf :", files);
   const publicIds = Array.isArray(files)
     ? files.map((file) => file.public_id) // Map public_id from the array
     : [files.public_id]; // If single object, wrap public_id in an array
-  console.log("id ------------ - ", publicIds);
+
   try {
     // Delete multiple files from Cloudinary using async/await
     const deleteResults = await Promise.all(
@@ -74,6 +73,7 @@ export const deleteFileFromCloudinary = async (files) => {
       };
     }
 
+    
     return { success: true, result: deleteResults };
   } catch (error) {
     console.error("Error during Cloudinary deletion process:", error);
