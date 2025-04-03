@@ -29,7 +29,7 @@ app.set("view engine", "ejs");
 
 //Routes Imports
 import authRouter from "./src/routes/auth/auth.js";
-// import { userRouter } from "./src/routes/user/user.js";
+import userRouter from "./src/routes/user/user.js";
 import featureRouter from "./src/routes/feature/feature.js";
 import bannerRouter from "./src/routes/banner/banner.js";
 import projectRouter from "./src/routes/project/project.js";
