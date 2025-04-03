@@ -2,7 +2,7 @@ export const DB_NAME = "R2M_DB";
 
 export const COOKIE_OPTIONS = {
   httpOnly: true,
-  sameSite: process.env.NODE_ENV === "production" ? "lax" : "Strict",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "Strict",
   secure: process.env.NODE_ENV !== "development",
 };
 

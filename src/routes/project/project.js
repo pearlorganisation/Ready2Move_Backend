@@ -17,7 +17,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(getAllProjects)
+  .get(getAllProjects) // no filtering
   .post(
     authenticateToken,
     verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),

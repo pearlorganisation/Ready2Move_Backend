@@ -16,7 +16,6 @@ export const createProperty = asyncHandler(async (req, res, next) => {
       imageGallery,
       "Property"
     );
-    
   }
 
   const property = await Property.create({
@@ -162,15 +161,10 @@ export const updatePropertyBySlug = asyncHandler(async (req, res, next) => {
         update: {
           $set: {
             ...otherFields,
-            area: otherFields.area && JSON.parse(otherFields.area),
-            bankOfApproval:
-              otherFields.bankOfApproval &&
-              JSON.parse(otherFields.bankOfApproval),
-            aminities:
-              otherFields.aminities && JSON.parse(otherFields.aminities),
-            otherFeatures:
-              otherFields.otherFeatures &&
-              JSON.parse(otherFields.otherFeatures),
+            area: othesafeParse(otherFields.area),
+            bankOfApproval: safeParse(otherFields.bankOfApproval),
+            aminities: safeParse(otherFields.aminities),
+            otherFeatures: safeParse(otherFields.otherFeatures),
           },
         },
       },
