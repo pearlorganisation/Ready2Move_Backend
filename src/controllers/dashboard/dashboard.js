@@ -14,6 +14,7 @@ export const getDashboardMetrics = asyncHandler(async (req, res, next) => {
       Lead.find()
         .populate({ path: "property", select: "title service property" })
         .populate({ path: "project", select: "title service projectType" })
+        .populate({ path: "assignedTo", select: "name role" })
         .sort({ createdAt: -1 })
         .limit(5), // Fetch only required fields
     ]);
