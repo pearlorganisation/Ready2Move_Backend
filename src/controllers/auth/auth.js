@@ -124,6 +124,7 @@ export const login = asyncHandler(async (req, res, next) => {
   }
 
   const access_token = existingUser.generateAccessToken();
+  const refresh_token = existingUser.generateRefreshToken();
 
   // Convert Mongoose document to plain object
   const sanitizedUser = existingUser.toObject();
@@ -135,7 +136,15 @@ export const login = asyncHandler(async (req, res, next) => {
   res
     .cookie("access_token", access_token, {
       ...COOKIE_OPTIONS,
-      expires: new Date(new Date().setMonth(new Date().getMonth() + 2)), // Expires in 2 months
+      expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
+    })
+    .cookie("refresh_token", refresh_token, {
+      ...COOKIE_OPTIONS,
+      expires: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days
+    })
+    .cookie("user_role", existingUser.role, {
+      ...COOKIE_OPTIONS,
+      expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000), // 1 day
     })
     .status(200)
     .json({
@@ -146,8 +155,26 @@ export const login = asyncHandler(async (req, res, next) => {
 });
 
 export const logout = asyncHandler(async (req, res, next) => {
-  res
-    .clearCookie("access_token", COOKIE_OPTIONS)
-    .status(200)
-    .json({ success: true, message: "Logout Successfull" });
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $unset: { refreshToken: 1 } },
+      { new: true }
+    );
+
+    // Check if user was found
+    if (!user) {
+      return next(new ApiErrorResponse("User not found", 404)); // Return 404 if no user found
+    }
+
+    res
+      .cookie("access_token", "", { ...COOKIE_OPTIONS, maxAge: 0 })
+      .cookie("refresh_token", "", { ...COOKIE_OPTIONS, maxAge: 0 })
+      .cookie("user_role", "", { ...COOKIE_OPTIONS, maxAge: 0 })
+      .status(200)
+      .json({ success: true, message: "Logout successfully!" });
+  } catch (error) {
+    console.log(`Error in logout: ${error.message}`);
+    return next(new ApiErrorResponse("Error in logout", 500));
+  }
 });
