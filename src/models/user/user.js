@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { USER_ROLES_ENUM } from "../../../constants.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 const userSchema = new mongoose.Schema(
   {
@@ -80,16 +82,17 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 
-userSchema.methods.generateRefreshToken = function(){
+userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
-      {
-        _id: this._id,
-      },
-      process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-      }
-  )
-}
+    {
+      _id: this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+    }
+  );
+};
 
 const User = mongoose.model("User", userSchema);
 
