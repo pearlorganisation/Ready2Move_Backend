@@ -19,12 +19,12 @@ router
   .route("/")
   .post(
     authenticateToken,
-    verifyPermission([
-      USER_ROLES_ENUM.ADMIN,
-      USER_ROLES_ENUM.BUILDER,
-      USER_ROLES_ENUM.AGENT,
-      USER_ROLES_ENUM.USER,
-    ]),
+    // verifyPermission([
+    //   USER_ROLES_ENUM.ADMIN,
+    //   USER_ROLES_ENUM.BUILDER,
+    //   USER_ROLES_ENUM.AGENT,
+    //   USER_ROLES_ENUM.USER,
+    // ]),
     upload.array("imageGallery", 8),
     createProperty
   )

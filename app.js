@@ -32,7 +32,7 @@ import projectRouter from "./src/routes/project/project.js";
 import propertyRouter from "./src/routes/property/property.js";
 import leadRouter from "./src/routes/lead/leads.js";
 import dashboardRouter from "./src/routes/dashboard/dashoard.js";
-
+import userRouter from "./src/routes/user/user.js"
 app.get("/", (req, res) => {
   res.status(200).send("APIs are working...");
 });
@@ -45,7 +45,7 @@ app.use("/api/v1/banners", bannerRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/properties", propertyRouter);
 app.use("/api/v1/leads", leadRouter);
-
+app.use("/api/v1/users", userRouter)
 app.use(errorHandler);
 
 export { app };

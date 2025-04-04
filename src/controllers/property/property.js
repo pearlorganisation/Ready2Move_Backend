@@ -18,9 +18,9 @@ export const createProperty = asyncHandler(async (req, res, next) => {
     );
     
   }
-
+ console.log("the requested body is", req.body)
   const property = await Property.create({
-    user: req.user._id,
+    user: req.body.user,
     ...req.body,
     area: safeParse(req.body.area),
     bankOfApproval: safeParse(req.body.bankOfApproval),

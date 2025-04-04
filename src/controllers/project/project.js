@@ -12,11 +12,11 @@ export const createProject = asyncHandler(async (req, res, next) => {
   console.log("requested body is", req.body);
 
   // Get uploaded images
-  const imageGallary = req.files;
+  const imageGallery = req.files;
   let imageGallaryResponse = null;
 
-  if (imageGallary) {
-    imageGallaryResponse = await uploadFileToCloudinary(imageGallary, "Project");
+  if (imageGallery) {
+    imageGallaryResponse = await uploadFileToCloudinary(imageGallery, "Project");
   }
 
   console.log("the image response is", imageGallaryResponse)
@@ -42,7 +42,7 @@ export const createProject = asyncHandler(async (req, res, next) => {
     aminities: req.body.aminities,
     pricePerSqFt:req.body.pricePerSqFt,
     bankOfApproval: req.body.bankOfApproval,
-    imageGallary:imageGallaryResponse,
+    imageGallery:imageGallaryResponse,
     youtubeLink:req.body.youtubeLink
   });
 

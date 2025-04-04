@@ -124,7 +124,11 @@ export const login = asyncHandler(async (req, res, next) => {
   }
 
   const access_token = existingUser.generateAccessToken();
-
+  const refresh_token = existingUser.generateRefreshToken(); // generating the refresh token
+   
+  // saving the refreshtoken in existing user
+  existingUser.refreshToken = refresh_token;
+  await existingUser.save({validateBeforeSave: false})
   // Convert Mongoose document to plain object
   const sanitizedUser = existingUser.toObject();
   sanitizedUser.password = undefined;
@@ -135,16 +139,20 @@ export const login = asyncHandler(async (req, res, next) => {
   res
     .cookie("access_token", access_token, {
       ...COOKIE_OPTIONS,
-      expires: new Date(new Date().setMonth(new Date().getMonth() + 2)), // Expires in 2 months
+      expires: new Date(Date.now() + 20 * 60 * 1000), // Expires in 20 minutes
     })
-    .cookie("user_role", existingUser.role,{
+    .cookie("user_role", existingUser.role, {
       ...COOKIE_OPTIONS,
-      expires:new Date(new Date().setMonth(new Date().getMonth() + 2))
+      expires: new Date(Date.now() + 20 * 60 * 1000), // Expires in 20 minutes
+    })
+    .cookie("refresh_token", refresh_token,{
+      ...COOKIE_OPTIONS,
+      expires: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // Expires in 15 days
     })
     .status(200)
     .json({
       success: true,
-      message: "Login Successfull",
+      message: "Login Successful",
       user: sanitizedUser,
     });
 });

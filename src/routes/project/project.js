@@ -19,8 +19,8 @@ router
   .route("/")
   .get(getAllProjects)
   .post(
-    authenticateToken,
-    verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),
+    // authenticateToken,
+    // verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),
     upload.array("imageGallery", 8),
     createProject
   );
