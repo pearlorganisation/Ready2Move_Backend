@@ -9,6 +9,7 @@ import { paginate } from "../../utils/pagination.js";
 import { safeParse } from "../../utils/safeParse.js";
 
 export const createProperty = asyncHandler(async (req, res, next) => {
+  console.log("gjkk",req.body)
   const imageGallery = req.files;
   let imageGalleryResponse = null;
   if (imageGallery) {
@@ -24,7 +25,7 @@ export const createProperty = asyncHandler(async (req, res, next) => {
     ...req.body,
     area: safeParse(req.body.area),
     bankOfApproval: safeParse(req.body.bankOfApproval),
-    aminities: safeParse(req.body.aminities),
+    aminities: safeParse(req.body.amenities),
     otherFeatures: safeParse(req.body.otherFeatures),
     imageGallery: imageGalleryResponse?.length > 0 ? imageGalleryResponse : [],
   });

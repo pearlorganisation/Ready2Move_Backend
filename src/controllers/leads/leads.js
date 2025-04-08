@@ -25,6 +25,7 @@ export const createLead = asyncHandler(async (req, res, next) => {
 export const getAllLeads = asyncHandler(async (req, res, next) => {
   const { page = 1, limit = 10, status, propertyOrProject } = req.query;
 
+  console.log(status, "----", propertyOrProject);
   const filter = {
     ...(status && { status: { $regex: `^${status}$`, $options: "i" } }), //Match an Exact Word (Case-Insensitive)
     ...(propertyOrProject === "project" && {
@@ -40,7 +41,11 @@ export const getAllLeads = asyncHandler(async (req, res, next) => {
     Lead,
     parseInt(page),
     parseInt(limit),
-    filter
+    filter,
+    [ {path: "assignedTo", select: "name role"}, 
+      {path: "property", select: "title service property"}, 
+      {path: "project", select: "title service projectType"}
+    ]
   );
 
   if (!leads || leads.lenght === 0) {
