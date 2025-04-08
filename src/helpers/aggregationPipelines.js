@@ -24,3 +24,47 @@ export const buildFeaturePipeline = (filter, page, limit, paging) => {
     },
   ];
 };
+
+export const buildProjectSearchPipeline = (query, page, limit) => {
+  const skip = (page - 1) * limit;  
+  return [
+    {
+      $search: {
+        index: "default",
+        compound: {
+          should: [
+            {
+              autocomplete: {
+                query,
+                path: "title",
+                fuzzy: {
+                  maxEdits: 1,
+                },
+              },
+            },
+            {
+              text: {
+                query,
+                path: [
+                  "description",
+                  "locality",
+                  "city",
+                  "state",
+                  "service",
+                  "projectType",
+                  "reraNumber",
+                ],
+              },
+            },
+          ],
+        },
+      },
+    },
+    {
+      $facet: {
+        data: [{ $skip: skip }, { $limit: limit }],
+        count: [{ $count: "total" }],
+      },
+    },
+  ];
+};

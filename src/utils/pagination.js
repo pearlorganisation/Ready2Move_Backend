@@ -1,3 +1,5 @@
+import { generatePagesArray } from "./generatePagesArray.js";
+
 export const paginate = async (
   model,
   page = 1,
@@ -30,20 +32,7 @@ export const paginate = async (
 
   // Calculate total pages and create pages array
   const totalPages = Math.ceil(totalDocuments / limit);
-  let pagesArray = [1];
-
-  if (totalPages > 3) {
-    if (page > 2) pagesArray.push(page - 1);
-    pagesArray.push(page);
-    if (page < totalPages - 1) pagesArray.push(page + 1);
-    if (!pagesArray.includes(totalPages)) pagesArray.push(totalPages);
-  } else {
-    for (let i = 2; i <= totalPages; i++) {
-      pagesArray.push(i);
-    }
-  }
-
-  pagesArray = [...new Set(pagesArray)].sort((a, b) => a - b);
+  const pagesArray = generatePagesArray(totalPages, page);
 
   // Build pagination object
   const pagination = {

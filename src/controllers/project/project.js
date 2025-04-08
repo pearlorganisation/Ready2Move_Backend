@@ -2,9 +2,12 @@ import {
   deleteFileFromCloudinary,
   uploadFileToCloudinary,
 } from "../../config/cloudinary.js";
+import { buildProjectSearchPipeline } from "../../helpers/aggregationPipelines.js";
 import Project from "../../models/project/project.js";
+import { buildPaginationObject } from "../../utils/buildPaginationObject.js";
 import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
+import { generatePagesArray } from "../../utils/generatePagesArray.js";
 import { paginate } from "../../utils/pagination.js";
 import { safeParse } from "../../utils/safeParse.js";
 
@@ -197,4 +200,45 @@ export const deleteProjectById = asyncHandler(async (req, res, next) => {
   return res
     .status(200)
     .json({ success: true, message: "Deleted the Project successfully" });
+});
+
+export const searchProjects = asyncHandler(async (req, res, next) => {
+  const { q, page = 1, limit = 10 } = req.query;
+  if (!q || q.trim() === "") {
+    return next(new ApiError("Search query is required", 400));
+  }
+  // Run main search query with pagination
+  const pipline = buildProjectSearchPipeline(
+    q,
+    parseInt(page),
+    parseInt(limit)
+  );
+  const [result] = await Project.aggregate(pipline);
+  const projects = result?.data || [];
+
+  if (projects.length === 0) {
+    return next(new ApiError("No Projects found", 404));
+  }
+
+  const totalResults = result?.count[0]?.total || 0;
+  const totalPages = Math.ceil(totalResults / parseInt(limit));
+
+  // Generate Pagination Array
+  const pagesArray = generatePagesArray(totalPages, parseInt(page));
+
+  // Build Pagination Object
+  const pagination = buildPaginationObject({
+    totalResults,
+    page,
+    limit,
+    totalPages,
+    pagesArray,
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Projects found successfully",
+    pagination,
+    data: projects,
+  });
 });
