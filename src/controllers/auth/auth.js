@@ -54,17 +54,29 @@ export const verifyOTP = asyncHandler(async (req, res, next) => {
   const otpDoc = await OTP.findOne({ email, otp, type });
   if (!otpDoc) return next(new ApiError("OTP is expired", 400));
 
-  const user = await User.findOneAndUpdate(
-    { email },
-    { isVerified: true },
-    { new: true }
-  );
-  if (!user) return next(new ApiError("User not found", 400));
+  if (type === "REGISTER") {
+    const user = await User.findOneAndUpdate(
+      { email },
+      { isVerified: true },
+      { new: true }
+    );
+    if (!user) return next(new ApiError("User not found", 400));
+  } else if (type === "FORGOT_PASSWORD") {
+    const user = await User.findOne({ email });
+    if (!user) return next(new ApiError("User not found", 400));
+  } else {
+    return next(new ApiError("Invalid OTP type", 400));
+  }
 
+  // OTP is verified — remove it
   await OTP.deleteOne({ email, otp, type });
+
   res.status(200).json({
     success: true,
-    message: "OTP verified. User registered successfully.",
+    message:
+      type === "REGISTER"
+        ? "OTP verified. User registered successfully."
+        : "OTP verified. You can now reset your password.",
   });
 });
 
