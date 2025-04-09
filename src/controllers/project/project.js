@@ -160,17 +160,11 @@ export const updateProjectBySlug = asyncHandler(async (req, res, next) => {
         update: {
           $set: {
             ...otherFields,
-            areaRange:
-              otherFields.areaRange && JSON.parse(otherFields.areaRange),
-            priceRange:
-              otherFields.priceRange && JSON.parse(otherFields.priceRange),
-            availability:
-              otherFields.availability && JSON.parse(otherFields.availability),
-            aminities:
-              otherFields.aminities && JSON.parse(otherFields.aminities),
-            bankOfApproval:
-              otherFields.bankOfApproval &&
-              JSON.parse(otherFields.bankOfApproval),
+            areaRange: safeParse(otherFields.areaRange),
+            priceRange: safeParse(otherFields.priceRange),
+            availability: safeParse(otherFields.availability),
+            aminities: safeParse(otherFields.aminities),
+            bankOfApproval: safeParse(otherFields.bankOfApproval),
           },
         },
       },

@@ -15,7 +15,7 @@ app.use(
             "http://localhost:3002",
             "http://localhost:3001",
           ]
-        : ["*"],
+        : ["https://ready2-move.vercel.app"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Specify allowed HTTP methods
     allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
     credentials: true,
@@ -29,14 +29,14 @@ app.set("view engine", "ejs");
 
 //Routes Imports
 import authRouter from "./src/routes/auth/auth.js";
-// import { userRouter } from "./src/routes/user/user.js";
+import userRouter from "./src/routes/user/user.js";
 import featureRouter from "./src/routes/feature/feature.js";
 import bannerRouter from "./src/routes/banner/banner.js";
 import projectRouter from "./src/routes/project/project.js";
 import propertyRouter from "./src/routes/property/property.js";
 import leadRouter from "./src/routes/lead/leads.js";
 import dashboardRouter from "./src/routes/dashboard/dashoard.js";
-import userRouter from "./src/routes/user/user.js";
+import faqRouter from "./src/routes/faq/faq.js";
 
 app.get("/", (req, res) => {
   res.status(200).send("APIs are working...");
@@ -51,6 +51,7 @@ app.use("/api/v1/banners", bannerRouter);
 app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/properties", propertyRouter);
 app.use("/api/v1/leads", leadRouter);
+app.use("/api/v1/faqs", faqRouter);
 
 app.use(errorHandler);
 

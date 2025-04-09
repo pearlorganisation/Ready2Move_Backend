@@ -28,7 +28,7 @@ router
     upload.array("imageGallery", 8),
     createProperty
   )
-  .get(getAllProperties);
+  .get(getAllProperties); // no filtering, sorting and searching yet
 
 router
   .route("/:slug")
