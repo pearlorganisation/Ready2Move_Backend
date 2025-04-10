@@ -72,7 +72,8 @@ export const login = asyncHandler(async (req, res, next) => {
 
   const access_token = existingUser.generateAccessToken();
   const refresh_token = existingUser.generateRefreshToken();
-
+  existingUser.refreshToken = refresh_token
+  await existingUser.save()
   // Convert Mongoose document to plain object
   const sanitizedUser = existingUser.toObject();
   sanitizedUser.password = undefined;
