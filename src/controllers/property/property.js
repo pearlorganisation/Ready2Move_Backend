@@ -16,7 +16,6 @@ export const createProperty = asyncHandler(async (req, res, next) => {
       imageGallery,
       "Property"
     );
-    
   }
  console.log("the requested body is", req.body)
   const property = await Property.create({
@@ -69,12 +68,31 @@ export const getPropertyBySlug = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllProperties = asyncHandler(async (req, res, next) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10, priceRange, bedRooms, bathRooms } = req.query;
+  const filter = {};
+  if (priceRange > 0) {
+    filter.expectedPrice = {
+      $lte: priceRange,
+    };
+  }
+
+  if (bedRooms > 0) {
+    filter.noOfBedrooms = {
+      $lte: bedRooms,
+    };
+  }
+
+  if (bathRooms > 0) {
+    filter.noOfBathrooms = {
+      $lte: bathRooms,
+    };
+  }
+
   const { data: properties, pagination } = await paginate(
     Property,
     parseInt(page),
     parseInt(limit),
-    {},
+    filter,
     [
       { path: "user", select: "name email phoneNumber" },
       { path: "propertyType", select: "name type" },
@@ -162,15 +180,10 @@ export const updatePropertyBySlug = asyncHandler(async (req, res, next) => {
         update: {
           $set: {
             ...otherFields,
-            area: otherFields.area && JSON.parse(otherFields.area),
-            bankOfApproval:
-              otherFields.bankOfApproval &&
-              JSON.parse(otherFields.bankOfApproval),
-            aminities:
-              otherFields.aminities && JSON.parse(otherFields.aminities),
-            otherFeatures:
-              otherFields.otherFeatures &&
-              JSON.parse(otherFields.otherFeatures),
+            area: othesafeParse(otherFields.area),
+            bankOfApproval: safeParse(otherFields.bankOfApproval),
+            aminities: safeParse(otherFields.aminities),
+            otherFeatures: safeParse(otherFields.otherFeatures),
           },
         },
       },

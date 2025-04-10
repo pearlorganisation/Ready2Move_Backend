@@ -4,6 +4,7 @@ import {
   deleteProjectById,
   getAllProjects,
   getProjectBySlug,
+  searchProjects,
   updateProjectBySlug,
 } from "../../controllers/project/project.js";
 import { upload } from "../../middlewares/multer.js";
@@ -17,7 +18,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(getAllProjects)
+  .get(getAllProjects) // no filtering, sorting and searching yet
   .post(
     authenticateToken,
     verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),
@@ -25,11 +26,24 @@ router
     createProject
   );
 
+router.route("/search").get(searchProjects); // no filtering, sorting and searching yet
+
 router
   .route("/:slug")
   .get(getProjectBySlug)
-  .patch(upload.array("imageGallery", 8), updateProjectBySlug);
+  .patch(
+    authenticateToken,
+    verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),
+    upload.array("imageGallery", 8),
+    updateProjectBySlug
+  );
 
-router.route("/:id").delete(deleteProjectById);
+router
+  .route("/:id")
+  .delete(
+    authenticateToken,
+    verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),
+    deleteProjectById
+  );
 
 export default router;

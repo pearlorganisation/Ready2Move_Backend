@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { USER_ROLES_ENUM } from "../../../constants.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+dotenv.config();
 
 const userSchema = new mongoose.Schema(
   {
@@ -32,7 +34,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      minlength: 8,
+      minlength: [8, "Password must be at least 8 characters long"],
       match: [
         /^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$/,
         "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one special character",
@@ -44,7 +46,7 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
     isVerified: { type: Boolean, default: false },
-    refreshToken:{type: String }
+    refreshToken: { type: String },
   },
   {
     timestamps: true,
@@ -80,17 +82,17 @@ userSchema.methods.generateAccessToken = function () {
   );
 };
 
-userSchema.methods.generateRefreshToken = function(){
+userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
-      {
-        _id: this._id,
-      },
-      process.env.REFRESH_TOKEN_SECRET, {
-        expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-      }
-  )
-}
-
+    {
+      _id: this._id,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+    }
+  );
+};
 
 const User = mongoose.model("User", userSchema);
 

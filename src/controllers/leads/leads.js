@@ -40,7 +40,12 @@ export const getAllLeads = asyncHandler(async (req, res, next) => {
     Lead,
     parseInt(page),
     parseInt(limit),
-    filter
+    filter,
+    [
+      { path: "assignedTo", select: "name role" },
+      { path: "property", select: "title service property" },
+      { path: "project", select: "title service projectType" },
+    ] // Populate assignedTo field with name and email
   );
 
   if (!leads || leads.lenght === 0) {
