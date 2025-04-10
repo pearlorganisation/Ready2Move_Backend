@@ -165,7 +165,7 @@ export const resetPassword = asyncHandler(async (req, res, next) => {
 
   const user = await User.findOne({ email });
   if (!user) {
-    return next(new ApiErrorResponse("User not found!", 401));
+    return next(new ApiError("User not found!", 401));
   }
 
   user.password = newPassword;
