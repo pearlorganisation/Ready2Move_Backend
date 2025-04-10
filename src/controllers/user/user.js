@@ -134,46 +134,4 @@ export const refreshTokenController = asyncHandler(async (req, res, next) => {
   }
 });
 
-export const forgotPassword = asyncHandler(async (req, res, next) => {
-  const { email } = req.body;
-  if (!email) {
-    return next(new ApiError("Email is required", 400));
-  }
-  const existingUser = await User.findOne({ email });
-  if (!existingUser) return next(new ApiError("No user found.", 400));
-  const otp = generateOTP();
-  await sendPasswordResetOTPOnMail(email, { name: existingUser.name, otp });
-  await OTP.findOneAndReplace(
-    { email, type: "FORGOT_PASSWORD" },
-    { otp, email, type: "FORGOT_PASSWORD" },
-    { upsert: true, new: true } // upsert: Creates a new document if no match is found., new: returns updated doc
-  );
-  return res.status(200).json({
-    success: true,
-    message: "OTP sent for password reset to your email.",
-  });
-});
 
-export const resetPassword = asyncHandler(async (req, res, next) => {
-  const { newPassword, confirmNewPassword } = req.body;
-  const { otp } = req.body;
-  if (!newPassword || !confirmNewPassword) {
-    return next(new ApiError("All fields are required", 400));
-  }
-  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-  if (!decoded) {
-    return next(new ApiErrorResponse("Invalid token!", 400));
-  }
-
-  const user = await User.findById(decoded.userId);
-  if (!user) {
-    return next(new ApiErrorResponse("User not found!", 401));
-  }
-
-  user.password = password;
-  await user.save();
-
-  return res
-    .status(200)
-    .json({ success: true, message: "Password reset successfully." });
-});

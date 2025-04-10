@@ -1,6 +1,5 @@
 import express from "express";
 import {
-  forgotPassword,
   getAllUsers,
   getUserData,
   refreshTokenController,
@@ -17,6 +16,6 @@ router
   .patch(authenticateToken, updateUserData);
 
 router.route("/refresh-token").post(refreshTokenController);
-router.route("/forgot-password").post(forgotPassword);
+
 
 export default router;
