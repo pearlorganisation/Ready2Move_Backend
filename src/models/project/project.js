@@ -43,6 +43,7 @@ const projectSchema = new mongoose.Schema(
           public_id: { type: String, required: true },
         },
       ],
+      required: [true, "Image gallery is required"],
       validate: {
         validator: function (images) {
           return images.length <= 8; // Maximum 8 images allowed
