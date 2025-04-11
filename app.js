@@ -36,7 +36,7 @@ import projectRouter from "./src/routes/project/project.js";
 import propertyRouter from "./src/routes/property/property.js";
 import leadRouter from "./src/routes/lead/leads.js";
 import dashboardRouter from "./src/routes/dashboard/dashoard.js";
- import faqRouter from "./src/routes/faq/faq.js";
+     import faqRouter from "./src/routes/faq/faq.js";
 
 app.get("/", (req, res) => {
   res.status(200).send("APIs are working...");
