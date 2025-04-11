@@ -90,7 +90,7 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    message: "All Projects found successfully",
+    message: "Projects found successfully",
     pagination,
     data: projects,
   });
@@ -202,35 +202,145 @@ export const deleteProjectById = asyncHandler(async (req, res, next) => {
     .json({ success: true, message: "Deleted the Project successfully" });
 });
 
+// export const searchProjects = asyncHandler(async (req, res, next) => {
+//   const {
+//     q,
+//     page = 1,
+//     limit = 10,
+//     service,
+//     projectType,
+//     minArea,
+//     maxArea,
+//     minPrice,
+//     maxPrice,
+//   } = req.query;
+
+//   let projects = [];
+//   let totalResults = 0;
+//   if ((q ?? "").trim() !== "") {
+//     // Run main search query with pagination
+//     const pipline = buildProjectSearchPipeline(
+//       q,
+//       parseInt(page),
+//       parseInt(limit),
+//       {
+//         service,
+//         projectType,
+//         minArea: parseFloat(minArea),
+//         maxArea: parseFloat(maxArea),
+//         minPrice: parseFloat(minPrice),
+//         maxPrice: parseFloat(maxPrice),
+//       }
+//     );
+//     const [result] = await Project.aggregate(pipline); // [ { data: [ [Object] ], count: [ [Object] ] } ]
+//     projects = result?.data || [];
+//     totalResults = result?.count[0]?.total || 0;
+//   } else {
+//     // No search query, return all projects with pagination
+//     totalResults = await Project.countDocuments();
+//     projects = await Project.find()
+//       .skip((parseInt(page) - 1) * parseInt(limit))
+//       .limit(parseInt(limit));
+//   }
+
+//   if (projects.length === 0) {
+//     return next(new ApiError("No Projects found", 404));
+//   }
+
+//   const totalPages = Math.ceil(totalResults / parseInt(limit));
+
+//   // Generate Pagination Array
+//   const pagesArray = generatePagesArray(totalPages, parseInt(page));
+
+//   // Build Pagination Object
+//   const pagination = buildPaginationObject({
+//     totalResults,
+//     page,
+//     limit,
+//     totalPages,
+//     pagesArray,
+//   });
+
+//   return res.status(200).json({
+//     success: true,
+//     message: "Projects found successfully",
+//     pagination,
+//     data: projects,
+//   });
+// });
 export const searchProjects = asyncHandler(async (req, res, next) => {
-  const { q, page = 1, limit = 10 } = req.query;
-  if (!q || q.trim() === "") {
-    return next(new ApiError("Search query is required", 400));
-  }
-  // Run main search query with pagination
-  const pipline = buildProjectSearchPipeline(
+  const {
     q,
-    parseInt(page),
-    parseInt(limit)
-  );
-  const [result] = await Project.aggregate(pipline);
-  const projects = result?.data || [];
+    page = 1,
+    limit = 10,
+    service,
+    projectType,
+    minArea,
+    maxArea,
+    minPrice,
+    maxPrice,
+  } = req.query;
+
+  const parsedPage = parseInt(page);
+  const parsedLimit = parseInt(limit);
+
+  const parsedFilters = {
+    service,
+    projectType,
+    minArea: parseFloat(minArea),
+    maxArea: parseFloat(maxArea),
+    minPrice: parseFloat(minPrice),
+    maxPrice: parseFloat(maxPrice),
+  };
+
+  // Determine if any filters or query are provided
+  const hasSearchFilters =
+    (q ?? "").trim() !== "" ||
+    service ||
+    projectType ||
+    !isNaN(parsedFilters.minArea) ||
+    !isNaN(parsedFilters.maxArea) ||
+    !isNaN(parsedFilters.minPrice) ||
+    !isNaN(parsedFilters.maxPrice);
+
+  let projects = [];
+  let totalResults = 0;
+
+  if (hasSearchFilters) {
+    const pipeline = buildProjectSearchPipeline(
+      q,
+      parsedPage,
+      parsedLimit,
+      parsedFilters
+    );
+    console.log("Pipeline:", JSON.stringify(pipeline, null, 2));
+    console.log("RES: ", await Project.aggregate(pipeline));
+    const [result] = await Project.aggregate(pipeline);
+    projects = result?.data || [];
+    totalResults = result?.total || 0; // result?.count?.[0]?.total
+  } else {
+    totalResults = await Project.countDocuments();
+    projects = await Project.find()
+      .skip((parsedPage - 1) * parsedLimit)
+      .limit(parsedLimit)
+      .populate([
+        { path: "availability", select: "name type" },
+        { path: "aminities", select: "name type" },
+        { path: "bankOfApproval", select: "name type" },
+      ]);
+  }
 
   if (projects.length === 0) {
     return next(new ApiError("No Projects found", 404));
   }
 
-  const totalResults = result?.count[0]?.total || 0;
-  const totalPages = Math.ceil(totalResults / parseInt(limit));
+  const totalPages = Math.ceil(totalResults / parsedLimit);
+  const pagesArray = generatePagesArray(totalPages, parsedPage);
 
-  // Generate Pagination Array
-  const pagesArray = generatePagesArray(totalPages, parseInt(page));
-
-  // Build Pagination Object
   const pagination = buildPaginationObject({
     totalResults,
-    page,
-    limit,
+    page: parsedPage,
+    limit: parsedLimit,
     totalPages,
     pagesArray,
   });

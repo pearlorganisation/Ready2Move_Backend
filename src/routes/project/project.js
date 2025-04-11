@@ -13,6 +13,7 @@ import {
   verifyPermission,
 } from "../../middlewares/authMiddleware.js";
 import { USER_ROLES_ENUM } from "../../../constants.js";
+import handleUpload from "../../middlewares/handleUpload.js";
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router
   .post(
     authenticateToken,
     verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),
-    upload.array("imageGallery", 8),
+    handleUpload(upload.array("imageGallery", 8)),
     createProject
   );
 
@@ -34,7 +35,7 @@ router
   .patch(
     authenticateToken,
     verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),
-    upload.array("imageGallery", 8),
+    handleUpload(upload.array("imageGallery", 8)),
     updateProjectBySlug
   );
 

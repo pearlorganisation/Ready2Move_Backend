@@ -50,7 +50,7 @@ const projectSchema = new mongoose.Schema(
       },
     },
     isFeatured: { type: Boolean, default: false },
-    youtubeEmbedLink: { type: String },
+    youtubeEmbedLink: { type: String, required: true },
   },
   {
     timestamps: true,
