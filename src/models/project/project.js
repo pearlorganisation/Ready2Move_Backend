@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { youtubeRegex } from "../../utils/regexUtils.js";
 
 const projectSchema = new mongoose.Schema(
   {
@@ -50,7 +51,16 @@ const projectSchema = new mongoose.Schema(
       },
     },
     isFeatured: { type: Boolean, default: false },
-    youtubeEmbedLink: { type: String, required: true },
+    youtubeEmbedLink: {
+      type: String,
+      required: [true, "YouTube embed link is required"],
+      validate: {
+        validator: function (v) {
+          return youtubeRegex.test(v);
+        },
+        message: (props) => `${props.value} is not a valid YouTube embed link.`,
+      },
+    },
   },
   {
     timestamps: true,

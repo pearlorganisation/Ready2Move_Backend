@@ -202,72 +202,6 @@ export const deleteProjectById = asyncHandler(async (req, res, next) => {
     .json({ success: true, message: "Deleted the Project successfully" });
 });
 
-// export const searchProjects = asyncHandler(async (req, res, next) => {
-//   const {
-//     q,
-//     page = 1,
-//     limit = 10,
-//     service,
-//     projectType,
-//     minArea,
-//     maxArea,
-//     minPrice,
-//     maxPrice,
-//   } = req.query;
-
-//   let projects = [];
-//   let totalResults = 0;
-//   if ((q ?? "").trim() !== "") {
-//     // Run main search query with pagination
-//     const pipline = buildProjectSearchPipeline(
-//       q,
-//       parseInt(page),
-//       parseInt(limit),
-//       {
-//         service,
-//         projectType,
-//         minArea: parseFloat(minArea),
-//         maxArea: parseFloat(maxArea),
-//         minPrice: parseFloat(minPrice),
-//         maxPrice: parseFloat(maxPrice),
-//       }
-//     );
-//     const [result] = await Project.aggregate(pipline); // [ { data: [ [Object] ], count: [ [Object] ] } ]
-//     projects = result?.data || [];
-//     totalResults = result?.count[0]?.total || 0;
-//   } else {
-//     // No search query, return all projects with pagination
-//     totalResults = await Project.countDocuments();
-//     projects = await Project.find()
-//       .skip((parseInt(page) - 1) * parseInt(limit))
-//       .limit(parseInt(limit));
-//   }
-
-//   if (projects.length === 0) {
-//     return next(new ApiError("No Projects found", 404));
-//   }
-
-//   const totalPages = Math.ceil(totalResults / parseInt(limit));
-
-//   // Generate Pagination Array
-//   const pagesArray = generatePagesArray(totalPages, parseInt(page));
-
-//   // Build Pagination Object
-//   const pagination = buildPaginationObject({
-//     totalResults,
-//     page,
-//     limit,
-//     totalPages,
-//     pagesArray,
-//   });
-
-//   return res.status(200).json({
-//     success: true,
-//     message: "Projects found successfully",
-//     pagination,
-//     data: projects,
-//   });
-// });
 export const searchProjects = asyncHandler(async (req, res, next) => {
   const {
     q,
@@ -321,6 +255,7 @@ export const searchProjects = asyncHandler(async (req, res, next) => {
   } else {
     totalResults = await Project.countDocuments();
     projects = await Project.find()
+      .sort({ createdAt: -1 })
       .skip((parsedPage - 1) * parsedLimit)
       .limit(parsedLimit)
       .populate([
