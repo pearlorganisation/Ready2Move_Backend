@@ -2,9 +2,12 @@ import {
   deleteFileFromCloudinary,
   uploadFileToCloudinary,
 } from "../../config/cloudinary.js";
+import { buildProjectSearchPipeline } from "../../helpers/aggregationPipelines.js";
 import Project from "../../models/project/project.js";
+import { buildPaginationObject } from "../../utils/buildPaginationObject.js";
 import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
+import { generatePagesArray } from "../../utils/generatePagesArray.js";
 import { paginate } from "../../utils/pagination.js";
 import { safeParse } from "../../utils/safeParse.js";
 
@@ -59,12 +62,99 @@ export const getProjectBySlug = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllProjects = asyncHandler(async (req, res, next) => {
-  const { page = 1, limit = 10 } = req.query; //Since the object is empty, the default values remain.
+  const {
+    page = 1,
+    limit = 10,
+    service,
+    projectType,
+    priceRange,
+    areaRange,
+    minPrice, // custom
+    maxPrice,
+    minArea,
+    maxArea,
+    q,
+  } = req.query;
+
+  const filter = {};
+  if (q) {
+    filter.$or = [
+      { title: { $regex: q, $options: "i" } }, // Exact match
+      { description: { $regex: q, $options: "i" } }, // Partial match
+      { locality: { $regex: q, $options: "i" } }, // Partial match
+      { city: { $regex: q, $options: "i" } }, // Partial match
+      { state: { $regex: q, $options: "i" } }, // Partial match
+      { service: { $regex: q, $options: "i" } }, // Partial match
+      { projectType: { $regex: q, $options: "i" } }, // Partial match
+      { reraNumber: { $regex: q, $options: "i" } }, // Partial match
+    ];
+  }
+  if (service) {
+    filter.service = { $regex: `^${service}$`, $options: "i" };
+  }
+  if (projectType) {
+    filter.projectType = { $regex: `^${projectType}$`, $options: "i" };
+  }
+
+  // PRICE FILTERING
+  if (
+    minPrice !== undefined &&
+    maxPrice !== undefined &&
+    minPrice !== "" &&
+    maxPrice !== ""
+  ) {
+    console.log("in custom price range");
+
+    // Use custom minPrice and maxPrice
+    const min = Number(minPrice);
+    const max = Number(maxPrice);
+
+    if (!isNaN(min) && !isNaN(max)) {
+      filter["priceRange.max"] = { $gte: min };
+      filter["priceRange.min"] = { $lte: max };
+    }
+  } else if (priceRange) {
+    console.log("in price range");
+    // Fallback to priceRange if custom values not provided
+    const [min, max] = priceRange.split(",").map(Number);
+
+    if (!isNaN(min) && !isNaN(max)) {
+      filter["priceRange.max"] = { $gte: min };
+      filter["priceRange.min"] = { $lte: max };
+    }
+  }
+
+  // AREA FILTERING
+  if (
+    minArea !== undefined &&
+    maxArea !== undefined &&
+    minArea !== "" &&
+    maxArea !== ""
+  ) {
+    // Use custom minArea and maxArea
+    const min = Number(minArea);
+    const max = Number(maxArea);
+
+    if (!isNaN(min) && !isNaN(max)) {
+      filter["areaRange.max"] = { $gte: min }; // max area must be greater than or equal to minArea
+      filter["areaRange.min"] = { $lte: max }; // min area must be less than or equal to maxArea
+    }
+  } else if (areaRange) {
+    // Fallback to areaRange if custom values not provided
+    const [min, max] = areaRange.split(",").map(Number);
+
+    if (!isNaN(min) && !isNaN(max)) {
+      filter["areaRange.max"] = { $gte: min }; // max area must be greater than or equal to min area
+      filter["areaRange.min"] = { $lte: max }; // min area must be less than or equal to max area
+    }
+  }
+
+  console.log("Filter: ", filter);
   const { data: projects, pagination } = await paginate(
     Project,
     parseInt(page),
     parseInt(limit),
-    {},
+    filter,
     [
       {
         path: "availability",
@@ -82,12 +172,16 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
   );
 
   if (!projects || projects.length === 0) {
-    return next(new ApiError("No Projects found", 404));
+    return res.status(200).json({
+      success: true,
+      message: "No projects found.",
+      data: [],
+    });
   }
 
   return res.status(200).json({
     success: true,
-    message: "All Projects found successfully",
+    message: "Projects found successfully",
     pagination,
     data: projects,
   });
@@ -198,3 +292,92 @@ export const deleteProjectById = asyncHandler(async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "Deleted the Project successfully" });
 });
+
+
+
+// Not completed yet
+// export const searchProjects = asyncHandler(async (req, res, next) => {
+//   const {
+//     q,
+//     page = 1,
+//     limit = 10,
+//     service,
+//     projectType,
+//     minArea,
+//     maxArea,
+//     minPrice,
+//     maxPrice,
+//   } = req.query;
+
+//   const parsedPage = parseInt(page);
+//   const parsedLimit = parseInt(limit);
+
+//   const parsedFilters = {
+//     service,
+//     projectType,
+//     minArea: parseFloat(minArea),
+//     maxArea: parseFloat(maxArea),
+//     minPrice: parseFloat(minPrice),
+//     maxPrice: parseFloat(maxPrice),
+//   };
+
+//   // Determine if any filters or query are provided
+//   const hasSearchFilters =
+//     (q ?? "").trim() !== "" ||
+//     service ||
+//     projectType ||
+//     !isNaN(parsedFilters.minArea) ||
+//     !isNaN(parsedFilters.maxArea) ||
+//     !isNaN(parsedFilters.minPrice) ||
+//     !isNaN(parsedFilters.maxPrice);
+
+//   let projects = [];
+//   let totalResults = 0;
+
+//   if (hasSearchFilters) {
+//     const pipeline = buildProjectSearchPipeline(
+//       q,
+//       parsedPage,
+//       parsedLimit,
+//       parsedFilters
+//     );
+//     console.log("Pipeline:", JSON.stringify(pipeline, null, 2));
+//     console.log("RES: ", await Project.aggregate(pipeline));
+//     const [result] = await Project.aggregate(pipeline);
+//     projects = result?.data || [];
+//     totalResults = result?.total || 0; // result?.count?.[0]?.total
+//   } else {
+//     totalResults = await Project.countDocuments();
+//     projects = await Project.find()
+//       .sort({ createdAt: -1 })
+//       .skip((parsedPage - 1) * parsedLimit)
+//       .limit(parsedLimit)
+//       .populate([
+//         { path: "availability", select: "name type" },
+//         { path: "aminities", select: "name type" },
+//         { path: "bankOfApproval", select: "name type" },
+//       ]);
+//   }
+
+//   if (projects.length === 0) {
+//     return next(new ApiError("No Projects found", 404));
+//   }
+
+//   const totalPages = Math.ceil(totalResults / parsedLimit);
+//   const pagesArray = generatePagesArray(totalPages, parsedPage);
+
+//   const pagination = buildPaginationObject({
+//     totalResults,
+//     page: parsedPage,
+//     limit: parsedLimit,
+//     totalPages,
+//     pagesArray,
+//   });
+
+//   return res.status(200).json({
+//     success: true,
+//     message: "Projects found successfully",
+//     pagination,
+//     data: projects,
+//   });
+// });

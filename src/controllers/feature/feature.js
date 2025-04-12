@@ -2,6 +2,7 @@ import { buildFeaturePipeline } from "../../helpers/aggregationPipelines.js";
 import Feature from "../../models/feature/feature.js";
 import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
+import { generatePagesArray } from "../../utils/generatePagesArray.js";
 
 export const createFeature = asyncHandler(async (req, res, next) => {
   const { name, type } = req.body;
@@ -37,17 +38,19 @@ export const getAllFeatures = asyncHandler(async (req, res, next) => {
 
   const totalDocuments = await Feature.countDocuments(filter);
   const totalPages = Math.ceil(totalDocuments / limit);
+  const pagesArray = generatePagesArray(totalPages, pageNum);
   if (isPaging) {
     // Pagination info
     const paginationInfo = {
       total: totalDocuments,
-      current_page: page,
-      limit,
-      next: page < totalPages ? page + 1 : null,
-      prev: page > 1 ? page - 1 : null,
-      pages: Array.from({ length: totalPages }, (_, i) => i + 1),
+      current_page: pageNum,
+      limit: limitNum,
+      next: pageNum < totalPages ? pageNum + 1 : null,
+      prev: pageNum > 1 ? pageNum - 1 : null,
+      pages: pagesArray,
     };
     return res.status(200).json({
+      success: true,
       message: "Fetched all Features successfully",
       paginationInfo,
       data: features,
@@ -55,6 +58,7 @@ export const getAllFeatures = asyncHandler(async (req, res, next) => {
   }
 
   return res.status(200).json({
+    success: true,
     message: "Fetched all Features successfully",
     data: features,
   });

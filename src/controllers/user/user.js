@@ -1,6 +1,9 @@
+import OTP from "../../models/otp/otp.js";
 import User from "../../models/user/user.js";
 import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
+import { sendPasswordResetOTPOnMail } from "../../utils/mail/emailTemplate.js";
+import { generateOTP } from "../../utils/otpUtils.js";
 import { paginate } from "../../utils/pagination.js";
 
 export const getAllUsers = asyncHandler(async (req, res, next) => {
@@ -32,7 +35,7 @@ export const getAllUsers = asyncHandler(async (req, res, next) => {
   });
 });
 
-export const loggedInUserData = asyncHandler(async (req, res, next) => {
+export const getUserData = asyncHandler(async (req, res, next) => {
   const user = req.user;
   if (!user) {
     return res.status(400).json({
@@ -58,6 +61,33 @@ export const loggedInUserData = asyncHandler(async (req, res, next) => {
   } catch (error) {
     next(error); // Let the global error handler handle server errors
   }
+});
+
+export const updateUserData = asyncHandler(async (req, res, next) => {
+  const userId = req.user?._id;
+  const user = await User.findById(userId);
+  if (!user) {
+    return next(new ApiError("User not found", 404));
+  }
+  if (req.body.email && req.body.email !== user.email) {
+    return next(new ApiError("Email cannot be updated", 400));
+  }
+  // Update user details
+  user.name = req.body.name || user.name;
+  user.phoneNumber = req.body.phoneNumber || user.phoneNumber;
+
+  if (req.body.password) {
+    user.password = req.body.password; // This triggers pre("save") for hashing
+  }
+
+  await user.save(); // Save to trigger middleware
+
+  user.password = undefined;
+  return res.status(200).json({
+    success: true,
+    message: "User details updated successfully!",
+    user,
+  });
 });
 
 export const refreshTokenController = asyncHandler(async (req, res, next) => {
@@ -103,3 +133,5 @@ export const refreshTokenController = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Invalid refresh token", 401));
   }
 });
+
+

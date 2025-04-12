@@ -69,12 +69,31 @@ export const getPropertyBySlug = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllProperties = asyncHandler(async (req, res, next) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 10, priceRange, bedRooms, bathRooms } = req.query;
+  const filter = {};
+  if (priceRange > 0) {
+    filter.expectedPrice = {
+      $lte: priceRange,
+    };
+  }
+
+  if (bedRooms > 0) {
+    filter.noOfBedrooms = {
+      $lte: bedRooms,
+    };
+  }
+
+  if (bathRooms > 0) {
+    filter.noOfBathrooms = {
+      $lte: bathRooms,
+    };
+  }
+
   const { data: properties, pagination } = await paginate(
     Property,
     parseInt(page),
     parseInt(limit),
-    {},
+    filter,
     [
       { path: "user", select: "name email phoneNumber" },
       { path: "propertyType", select: "name type" },
