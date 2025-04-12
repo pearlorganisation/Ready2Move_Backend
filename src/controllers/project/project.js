@@ -62,12 +62,99 @@ export const getProjectBySlug = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllProjects = asyncHandler(async (req, res, next) => {
-  const { page = 1, limit = 10 } = req.query; //Since the object is empty, the default values remain.
+  const {
+    page = 1,
+    limit = 10,
+    service,
+    projectType,
+    priceRange,
+    areaRange,
+    minPrice, // custom
+    maxPrice,
+    minArea,
+    maxArea,
+    q,
+  } = req.query;
+
+  const filter = {};
+  if (q) {
+    filter.$or = [
+      { title: { $regex: q, $options: "i" } }, // Exact match
+      { description: { $regex: q, $options: "i" } }, // Partial match
+      { locality: { $regex: q, $options: "i" } }, // Partial match
+      { city: { $regex: q, $options: "i" } }, // Partial match
+      { state: { $regex: q, $options: "i" } }, // Partial match
+      { service: { $regex: q, $options: "i" } }, // Partial match
+      { projectType: { $regex: q, $options: "i" } }, // Partial match
+      { reraNumber: { $regex: q, $options: "i" } }, // Partial match
+    ];
+  }
+  if (service) {
+    filter.service = { $regex: `^${service}$`, $options: "i" };
+  }
+  if (projectType) {
+    filter.projectType = { $regex: `^${projectType}$`, $options: "i" };
+  }
+
+  // PRICE FILTERING
+  if (
+    minPrice !== undefined &&
+    maxPrice !== undefined &&
+    minPrice !== "" &&
+    maxPrice !== ""
+  ) {
+    console.log("in custom price range");
+
+    // Use custom minPrice and maxPrice
+    const min = Number(minPrice);
+    const max = Number(maxPrice);
+
+    if (!isNaN(min) && !isNaN(max)) {
+      filter["priceRange.max"] = { $gte: min };
+      filter["priceRange.min"] = { $lte: max };
+    }
+  } else if (priceRange) {
+    console.log("in price range");
+    // Fallback to priceRange if custom values not provided
+    const [min, max] = priceRange.split(",").map(Number);
+
+    if (!isNaN(min) && !isNaN(max)) {
+      filter["priceRange.max"] = { $gte: min };
+      filter["priceRange.min"] = { $lte: max };
+    }
+  }
+
+  // AREA FILTERING
+  if (
+    minArea !== undefined &&
+    maxArea !== undefined &&
+    minArea !== "" &&
+    maxArea !== ""
+  ) {
+    // Use custom minArea and maxArea
+    const min = Number(minArea);
+    const max = Number(maxArea);
+
+    if (!isNaN(min) && !isNaN(max)) {
+      filter["areaRange.max"] = { $gte: min }; // max area must be greater than or equal to minArea
+      filter["areaRange.min"] = { $lte: max }; // min area must be less than or equal to maxArea
+    }
+  } else if (areaRange) {
+    // Fallback to areaRange if custom values not provided
+    const [min, max] = areaRange.split(",").map(Number);
+
+    if (!isNaN(min) && !isNaN(max)) {
+      filter["areaRange.max"] = { $gte: min }; // max area must be greater than or equal to min area
+      filter["areaRange.min"] = { $lte: max }; // min area must be less than or equal to max area
+    }
+  }
+
+  console.log("Filter: ", filter);
   const { data: projects, pagination } = await paginate(
     Project,
     parseInt(page),
     parseInt(limit),
-    {},
+    filter,
     [
       {
         path: "availability",
@@ -85,7 +172,11 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
   );
 
   if (!projects || projects.length === 0) {
-    return next(new ApiError("No Projects found", 404));
+    return res.status(200).json({
+      success: true,
+      message: "No projects found.",
+      data: [],
+    });
   }
 
   return res.status(200).json({
