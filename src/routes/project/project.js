@@ -4,7 +4,7 @@ import {
   deleteProjectById,
   getAllProjects,
   getProjectBySlug,
-  searchProjects,
+  // searchProjects,
   updateProjectBySlug,
 } from "../../controllers/project/project.js";
 import { upload } from "../../middlewares/multer.js";
@@ -27,7 +27,7 @@ router
     createProject
   );
 
-router.route("/search").get(searchProjects); // no filtering, sorting and searching yet
+// router.route("/search").get(searchProjects); // no filtering, sorting and searching yet
 
 router
   .route("/:slug")
