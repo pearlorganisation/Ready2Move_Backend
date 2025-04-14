@@ -69,10 +69,6 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
     projectType,
     priceRange,
     areaRange,
-    minPrice, // custom
-    maxPrice,
-    minArea,
-    maxArea,
     q,
   } = req.query;
 
@@ -257,89 +253,46 @@ export const deleteProjectById = asyncHandler(async (req, res, next) => {
     .json({ success: true, message: "Deleted the Project successfully" });
 });
 
-// Not completed yet
-// export const searchProjects = asyncHandler(async (req, res, next) => {
-//   const {
-//     q,
-//     page = 1,
-//     limit = 10,
-//     service,
-//     projectType,
-//     minArea,
-//     maxArea,
-//     minPrice,
-//     maxPrice,
-//   } = req.query;
+// Not completed yet ->  for home page
+export const searchProjects = asyncHandler(async (req, res, next) => {
+  const { q, page = 1, limit = 10, service, projectType } = req.query;
+  if (!q || q.trim() === "") {
+    return next(new ApiError("Search query is required", 400));
+  }
 
-//   const parsedPage = parseInt(page);
-//   const parsedLimit = parseInt(limit);
+  // Run main search query with pagination
+  const pipline = buildProjectSearchPipeline(
+    q,
+    parseInt(page),
+    parseInt(limit),
+    { service, projectType }
+  );
+  const [result] = await Project.aggregate(pipline);
+  const projects = result?.data || [];
 
-//   const parsedFilters = {
-//     service,
-//     projectType,
-//     minArea: parseFloat(minArea),
-//     maxArea: parseFloat(maxArea),
-//     minPrice: parseFloat(minPrice),
-//     maxPrice: parseFloat(maxPrice),
-//   };
+  if (projects.length === 0) {
+    return next(new ApiError("No Projects found", 404));
+  }
 
-//   // Determine if any filters or query are provided
-//   const hasSearchFilters =
-//     (q ?? "").trim() !== "" ||
-//     service ||
-//     projectType ||
-//     !isNaN(parsedFilters.minArea) ||
-//     !isNaN(parsedFilters.maxArea) ||
-//     !isNaN(parsedFilters.minPrice) ||
-//     !isNaN(parsedFilters.maxPrice);
+  const totalResults = result?.count[0]?.total || 0;
+  const totalPages = Math.ceil(totalResults / parseInt(limit));
 
-//   let projects = [];
-//   let totalResults = 0;
+  // Generate Pagination Array
+  const pagesArray = generatePagesArray(totalPages, parseInt(page));
 
-//   if (hasSearchFilters) {
-//     const pipeline = buildProjectSearchPipeline(
-//       q,
-//       parsedPage,
-//       parsedLimit,
-//       parsedFilters
-//     );
-//     console.log("Pipeline:", JSON.stringify(pipeline, null, 2));
-//     console.log("RES: ", await Project.aggregate(pipeline));
-//     const [result] = await Project.aggregate(pipeline);
-//     projects = result?.data || [];
-//     totalResults = result?.total || 0; // result?.count?.[0]?.total
-//   } else {
-//     totalResults = await Project.countDocuments();
-//     projects = await Project.find()
-//       .sort({ createdAt: -1 })
-//       .skip((parsedPage - 1) * parsedLimit)
-//       .limit(parsedLimit)
-//       .populate([
-//         { path: "availability", select: "name type" },
-//         { path: "aminities", select: "name type" },
-//         { path: "bankOfApproval", select: "name type" },
-//       ]);
-//   }
+  // Build Pagination Object
+  const pagination = buildPaginationObject({
+    totalResults,
+    page,
+    limit,
+    totalPages,
+    pagesArray,
+  });
 
-//   if (projects.length === 0) {
-//     return next(new ApiError("No Projects found", 404));
-//   }
-
-//   const totalPages = Math.ceil(totalResults / parsedLimit);
-//   const pagesArray = generatePagesArray(totalPages, parsedPage);
-
-//   const pagination = buildPaginationObject({
-//     totalResults,
-//     page: parsedPage,
-//     limit: parsedLimit,
-//     totalPages,
-//     pagesArray,
-//   });
-
-//   return res.status(200).json({
-//     success: true,
-//     message: "Projects found successfully",
-//     pagination,
-//     data: projects,
-//   });
-// });
+  return res.status(200).json({
+    success: true,
+    message: "Projects found successfully",
+    pagination,
+    data: projects,
+  });
+});
