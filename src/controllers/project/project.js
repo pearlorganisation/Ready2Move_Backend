@@ -253,7 +253,6 @@ export const deleteProjectById = asyncHandler(async (req, res, next) => {
     .json({ success: true, message: "Deleted the Project successfully" });
 });
 
-// Not completed yet ->  for home page
 export const searchProjects = asyncHandler(async (req, res, next) => {
   const { q, page = 1, limit = 10, service, projectType } = req.query;
   if (!q || q.trim() === "") {
@@ -267,6 +266,7 @@ export const searchProjects = asyncHandler(async (req, res, next) => {
     parseInt(limit),
     { service, projectType }
   );
+  console.log("pipeline: ", JSON.stringify(pipline, null, 2));
   const [result] = await Project.aggregate(pipline);
   const projects = result?.data || [];
 

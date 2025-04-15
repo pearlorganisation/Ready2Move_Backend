@@ -50,17 +50,36 @@ export const buildProjectSearchPipeline = (
               },
             },
             {
+              autocomplete: {
+                query,
+                path: "city",
+                fuzzy: {
+                  maxEdits: 1,
+                },
+              },
+            },
+            {
+              autocomplete: {
+                query,
+                path: "locality",
+                fuzzy: {
+                  maxEdits: 1,
+                },
+              },
+            },
+            {
+              autocomplete: {
+                query,
+                path: "state",
+                fuzzy: {
+                  maxEdits: 1,
+                },
+              },
+            },
+            {
               text: {
                 query,
-                path: [
-                  "description",
-                  "locality",
-                  "city",
-                  "state",
-                  "service",
-                  "projectType",
-                  "reraNumber",
-                ],
+                path: ["description", "projectType", "service", "reraNumber"],
               },
             },
           ],
@@ -71,8 +90,8 @@ export const buildProjectSearchPipeline = (
 
   // Apply filters if provided
   const matchStage = {};
-  if (service) matchStage.service = service;
-  if (projectType) matchStage.projectType = projectType;
+  if (service) matchStage.service = service.toUpperCase();
+  if (projectType) matchStage.projectType = projectType.toUpperCase();
 
   if (Object.keys(matchStage).length > 0) {
     pipeline.push({ $match: matchStage });
@@ -83,6 +102,13 @@ export const buildProjectSearchPipeline = (
     $sort: { createdAt: -1 }, // Change field if needed
   });
 
+  // Project only title and slug
+  pipeline.push({
+    $project: {
+      title: 1,
+      slug: 1,
+    },
+  });
   pipeline.push({
     $facet: {
       data: [{ $skip: skip }, { $limit: limit }],
