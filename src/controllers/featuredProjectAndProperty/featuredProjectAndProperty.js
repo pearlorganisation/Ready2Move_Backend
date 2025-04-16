@@ -5,7 +5,7 @@ import { asyncHandler } from "../../utils/error/asyncHandler.js";
 export const getAllFeaturedProjectsAndProperties = asyncHandler(
   async (req, res, next) => {
     const [featuredProjects, featuredProperties] = await Promise.all([
-      Project.find({ isFeatured: true }),
+      Project.find({ isFeatured: true }), // Send only required data. and need to populate some fields for both
       Property.find({ isFeatured: true }),
     ]);
 
