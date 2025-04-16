@@ -5,7 +5,6 @@ import { asyncHandler } from "../../utils/error/asyncHandler.js";
 export const getCityWithLocality = asyncHandler(async (req, res) => {
   const projectData = await Project.find({}, "city locality").lean();
   const propertyData = await Property.find({}, "city locality").lean();
-
   const groupByCity = (data) => {
     const map = {};
 
