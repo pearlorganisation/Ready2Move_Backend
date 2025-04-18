@@ -75,7 +75,7 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
   const filter = {};
   if (q) {
     filter.$or = [
-      { title: { $regex: q, $options: "i" } }, // Exact match
+      { title: { $regex: q, $options: "i" } },
       { description: { $regex: q, $options: "i" } }, // Partial match
       { locality: { $regex: q, $options: "i" } }, // Partial match
       { city: { $regex: q, $options: "i" } }, // Partial match

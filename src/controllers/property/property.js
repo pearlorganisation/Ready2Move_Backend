@@ -73,8 +73,38 @@ export const getPropertyBySlug = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllProperties = asyncHandler(async (req, res, next) => {
-  const { page = 1, limit = 10, priceRange, bedRooms, bathRooms } = req.query;
+  const {
+    page = 1,
+    limit = 10,
+    priceRange,
+    bedRooms,
+    bathRooms,
+    service,
+    propertyType,
+    q,
+  } = req.query;
   const filter = {};
+  if (q) {
+    filter.$or = [
+      { title: { $regex: q, $options: "i" } },
+      { description: { $regex: q, $options: "i" } },
+      { locality: { $regex: q, $options: "i" } },
+      { city: { $regex: q, $options: "i" } }, // Partial match
+      { state: { $regex: q, $options: "i" } }, // Partial match
+      { service: { $regex: q, $options: "i" } }, // Partial match
+      { property: { $regex: q, $options: "i" } }, // Partial match
+      { reraNumber: { $regex: q, $options: "i" } }, // Partial match
+      { apartmentName: { $regex: q, $options: "i" } }, // Partial match
+    ];
+  }
+
+  if (service) {
+    filter.service = { $regex: `^${service}$`, $options: "i" };
+  }
+  if (propertyType) {
+    filter.projectType = { $regex: `^${propertyType}$`, $options: "i" };
+  }
+
   if (priceRange > 0) {
     filter.expectedPrice = {
       $lte: priceRange,
@@ -116,7 +146,11 @@ export const getAllProperties = asyncHandler(async (req, res, next) => {
   );
 
   if (!properties || properties.length === 0) {
-    return next(new ApiError("No Properties found", 404));
+    return res.status(200).json({
+      success: true,
+      message: "No properties found.",
+      data: [],
+    });
   }
 
   return res.status(200).json({
