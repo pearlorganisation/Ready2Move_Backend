@@ -80,12 +80,59 @@ export const getProjectBySlug = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllProjects = asyncHandler(async (req, res, next) => {
-  const { page = 1, limit = 10 } = req.query; //Since the object is empty, the default values remain.
+  const {
+    page = 1,
+    limit = 10,
+    service,
+    projectType,
+    priceRange,
+    areaRange,
+    q,
+  } = req.query;
+
+  const filter = {};
+  if (q) {
+    filter.$or = [
+      { title: { $regex: q, $options: "i" } }, // Exact match
+      { description: { $regex: q, $options: "i" } }, // Partial match
+      { locality: { $regex: q, $options: "i" } }, // Partial match
+      { city: { $regex: q, $options: "i" } }, // Partial match
+      { state: { $regex: q, $options: "i" } }, // Partial match
+      { service: { $regex: q, $options: "i" } }, // Partial match
+      { projectType: { $regex: q, $options: "i" } }, // Partial match
+      { reraNumber: { $regex: q, $options: "i" } }, // Partial match
+    ];
+  }
+  if (service) {
+    filter.service = { $regex: `^${service}$`, $options: "i" };
+  }
+  if (projectType) {
+    filter.projectType = { $regex: `^${projectType}$`, $options: "i" };
+  }
+
+  // PRICE FILTERING
+  if (priceRange) {
+    const [min, max] = priceRange.split(",").map(Number);
+    if (!isNaN(min) && !isNaN(max)) {
+      filter["priceRange.max"] = { $gte: min };
+      filter["priceRange.min"] = { $lte: max };
+    }
+  }
+
+  // AREA FILTERING
+  if (areaRange) {
+    const [min, max] = areaRange.split(",").map(Number);
+    if (!isNaN(min) && !isNaN(max)) {
+      filter["areaRange.max"] = { $gte: min }; // max area must be greater than or equal to min area
+      filter["areaRange.min"] = { $lte: max }; // min area must be less than or equal to max area
+    }
+  }
+
   const { data: projects, pagination } = await paginate(
     Project,
     parseInt(page),
     parseInt(limit),
-    {},
+    filter,
     [
       {
         path: "availability",
@@ -103,12 +150,16 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
   );
 
   if (!projects || projects.length === 0) {
-    return next(new ApiError("No Projects found", 404));
+    return res.status(200).json({
+      success: true,
+      message: "No projects found.",
+      data: [],
+    });
   }
 
   return res.status(200).json({
     success: true,
-    message: "All Projects found successfully",
+    message: "Projects found successfully",
     pagination,
     data: projects,
   });
@@ -202,7 +253,7 @@ export const updateProjectBySlug = asyncHandler(async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    message: "Updated the Project successfully",
+    message: "Updated the Project successfully.",
     data: updatedProject,
   });
 });
@@ -221,16 +272,19 @@ export const deleteProjectById = asyncHandler(async (req, res, next) => {
 });
 
 export const searchProjects = asyncHandler(async (req, res, next) => {
-  const { q, page = 1, limit = 10 } = req.query;
+  const { q, page = 1, limit = 10, service, projectType } = req.query;
   if (!q || q.trim() === "") {
     return next(new ApiError("Search query is required", 400));
   }
+
   // Run main search query with pagination
   const pipline = buildProjectSearchPipeline(
     q,
     parseInt(page),
-    parseInt(limit)
+    parseInt(limit),
+    { service, projectType }
   );
+  console.log("pipeline: ", JSON.stringify(pipline, null, 2));
   const [result] = await Project.aggregate(pipline);
   const projects = result?.data || [];
 

@@ -34,6 +34,8 @@ export const paginate = async (
   const totalPages = Math.ceil(totalDocuments / limit);
   const pagesArray = generatePagesArray(totalPages, page);
 
+  // buildPaginationObject({});
+
   // Build pagination object
   const pagination = {
     total: totalDocuments,

@@ -12,6 +12,7 @@ import {
 } from "../../middlewares/authMiddleware.js";
 import { USER_ROLES_ENUM } from "../../../constants.js";
 import { upload } from "../../middlewares/multer.js";
+import handleUpload from "../../middlewares/handleUpload.js";
 
 const router = express.Router();
 
@@ -19,13 +20,13 @@ router
   .route("/")
   .post(
     authenticateToken,
-    // verifyPermission([
-    //   USER_ROLES_ENUM.ADMIN,
-    //   USER_ROLES_ENUM.BUILDER,
-    //   USER_ROLES_ENUM.AGENT,
-    //   USER_ROLES_ENUM.USER,
-    // ]),
-    upload.array("imageGallery", 8),
+    verifyPermission([
+      USER_ROLES_ENUM.ADMIN,
+      USER_ROLES_ENUM.BUILDER,
+      USER_ROLES_ENUM.AGENT,
+      USER_ROLES_ENUM.USER,
+    ]),
+    handleUpload(upload.array("imageGallery", 8)),
     createProperty
   )
   .get(getAllProperties); // no filtering, sorting and searching yet
@@ -41,7 +42,7 @@ router
       USER_ROLES_ENUM.AGENT,
       USER_ROLES_ENUM.USER,
     ]),
-    upload.array("imageGallery", 8),
+    handleUpload(upload.array("imageGallery", 8)),
     updatePropertyBySlug
   );
 
