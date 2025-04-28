@@ -2,11 +2,15 @@ import {
   deleteFileFromCloudinary,
   uploadFileToCloudinary,
 } from "../../config/cloudinary.js";
+import { buildPropertySearchPipeline } from "../../helpers/aggregationPipelines.js";
 import Property from "../../models/property/property.js";
+import { buildPaginationObject } from "../../utils/buildPaginationObject.js";
 import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
+import { generatePagesArray } from "../../utils/generatePagesArray.js";
 import { paginate } from "../../utils/pagination.js";
 import { safeParse } from "../../utils/safeParse.js";
+import mongoose from "mongoose";
 
 export const createProperty = asyncHandler(async (req, res, next) => {
   const imageGallery = req.files;
@@ -68,8 +72,38 @@ export const getPropertyBySlug = asyncHandler(async (req, res, next) => {
 });
 
 export const getAllProperties = asyncHandler(async (req, res, next) => {
-  const { page = 1, limit = 10, priceRange, bedRooms, bathRooms } = req.query;
+  const {
+    page = 1,
+    limit = 10,
+    priceRange,
+    bedRooms,
+    bathRooms,
+    service,
+    propertyType,
+    q,
+  } = req.query;
   const filter = {};
+  if (q) {
+    filter.$or = [
+      { title: { $regex: q, $options: "i" } },
+      { description: { $regex: q, $options: "i" } },
+      { locality: { $regex: q, $options: "i" } },
+      { city: { $regex: q, $options: "i" } }, // Partial match
+      { state: { $regex: q, $options: "i" } }, // Partial match
+      { service: { $regex: q, $options: "i" } }, // Partial match
+      { property: { $regex: q, $options: "i" } }, // Partial match
+      { reraNumber: { $regex: q, $options: "i" } }, // Partial match
+      { apartmentName: { $regex: q, $options: "i" } }, // Partial match
+    ];
+  }
+
+  if (service) {
+    filter.service = { $regex: `^${service}$`, $options: "i" };
+  }
+  if (propertyType) {
+    filter.projectType = { $regex: `^${propertyType}$`, $options: "i" };
+  }
+
   if (priceRange > 0) {
     filter.expectedPrice = {
       $lte: priceRange,
@@ -111,7 +145,11 @@ export const getAllProperties = asyncHandler(async (req, res, next) => {
   );
 
   if (!properties || properties.length === 0) {
-    return next(new ApiError("No Properties found", 404));
+    return res.status(200).json({
+      success: true,
+      message: "No properties found.",
+      data: [],
+    });
   }
 
   return res.status(200).json({
@@ -215,4 +253,66 @@ export const deletePropertyById = asyncHandler(async (req, res, next) => {
   return res
     .status(200)
     .json({ success: true, message: "Deleted the Property successfully" });
+});
+
+export const searchProperties = asyncHandler(async (req, res, next) => {
+  const {
+    page = 1,
+    limit = 10,
+    q,
+    service,
+    propertyType,
+    propertyCategory,
+  } = req.query;
+  if (!q || q.trim() === "") {
+    return next(new ApiError("Search query is required", 400));
+  }
+  const filter = {};
+  if (service) {
+    filter.service = service.toUpperCase();
+  }
+  if (propertyType) {
+    filter.property = propertyType.toUpperCase();
+  }
+  if (propertyCategory) {
+    filter.propertyType = new mongoose.Types.ObjectId(propertyCategory);
+  }
+  const pipeline = buildPropertySearchPipeline(
+    q,
+    parseInt(page),
+    parseInt(limit),
+    filter
+  );
+  // console.log("pipeline", JSON.stringify(pipeline, null, 2));
+  const [result] = await Property.aggregate(pipeline);
+  const properties = result?.data || [];
+  if (!properties || properties.length === 0) {
+    return res.status(200).json({
+      success: true,
+      message: "No properties found.",
+      data: [],
+    });
+  }
+
+  const totalResults = result?.count[0]?.total || 0;
+  const totalPages = Math.ceil(totalResults / parseInt(limit));
+
+  // Generate Pagination Array
+  const pagesArray = generatePagesArray(totalPages, parseInt(page));
+
+  // Build Pagination Object
+  const pagination = buildPaginationObject({
+    totalResults,
+    page,
+    limit,
+    totalPages,
+    pagesArray,
+  });
+
+  return res.status(200).json({
+    success: true,
+    message: "Properties found successfully",
+    pagination,
+    data: properties,
+  });
 });

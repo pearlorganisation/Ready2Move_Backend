@@ -37,7 +37,8 @@ import propertyRouter from "./src/routes/property/property.js";
 import featuredRouter from "./src/routes/featuredProjectAndProperty/featuredProjectAndProperty.js";
 import leadRouter from "./src/routes/lead/leads.js";
 import dashboardRouter from "./src/routes/dashboard/dashoard.js";
-     import faqRouter from "./src/routes/faq/faq.js";
+import faqRouter from "./src/routes/faq/faq.js";
+import footerRouter from "./src/routes/footer/footer.js";
 
 app.get("/", (req, res) => {
   res.status(200).send("APIs are working...");
@@ -53,7 +54,8 @@ app.use("/api/v1/projects", projectRouter);
 app.use("/api/v1/properties", propertyRouter);
 app.use("/api/v1/featured", featuredRouter);
 app.use("/api/v1/leads", leadRouter);
- app.use("/api/v1/faqs", faqRouter);
+app.use("/api/v1/faqs", faqRouter);
+app.use("/api/v1/footer", footerRouter);
 
 app.use(errorHandler);
 

@@ -15,15 +15,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(
-    authenticateToken,
-    verifyPermission([
-      USER_ROLES_ENUM.ADMIN,
-      USER_ROLES_ENUM.BUILDER,
-      USER_ROLES_ENUM.AGENT,
-    ]),
-    getAllFeatures
-  )
+  .get(getAllFeatures)
   .post(
     authenticateToken,
     verifyPermission([

@@ -4,6 +4,7 @@ import {
   deletePropertyById,
   getAllProperties,
   getPropertyBySlug,
+  searchProperties,
   updatePropertyBySlug,
 } from "../../controllers/property/property.js";
 import {
@@ -30,6 +31,8 @@ router
     createProperty
   )
   .get(getAllProperties); // no filtering, sorting and searching yet
+
+router.route("/search").get(searchProperties); // Searching for home page.
 
 router
   .route("/:slug")

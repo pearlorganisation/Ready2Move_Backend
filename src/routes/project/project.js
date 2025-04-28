@@ -5,7 +5,6 @@ import {
   getAllProjects,
   getProjectBySlug,
   searchProjects,
-  // searchProjects,
   updateProjectBySlug,
 } from "../../controllers/project/project.js";
 import { upload } from "../../middlewares/multer.js";
@@ -20,7 +19,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(getAllProjects) // no filtering, sorting and searching yet
+  .get(getAllProjects)
   .post(
     authenticateToken,
     verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),
@@ -28,7 +27,7 @@ router
     createProject
   );
 
-router.route("/search").get(searchProjects); // no filtering, sorting and searching yet
+router.route("/search").get(searchProjects); // Searching for home page.
 
 router
   .route("/:slug")

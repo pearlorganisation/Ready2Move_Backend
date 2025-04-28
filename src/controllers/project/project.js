@@ -93,7 +93,7 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
   const filter = {};
   if (q) {
     filter.$or = [
-      { title: { $regex: q, $options: "i" } }, // Exact match
+      { title: { $regex: q, $options: "i" } },
       { description: { $regex: q, $options: "i" } }, // Partial match
       { locality: { $regex: q, $options: "i" } }, // Partial match
       { city: { $regex: q, $options: "i" } }, // Partial match
@@ -288,8 +288,12 @@ export const searchProjects = asyncHandler(async (req, res, next) => {
   const [result] = await Project.aggregate(pipline);
   const projects = result?.data || [];
 
-  if (projects.length === 0) {
-    return next(new ApiError("No Projects found", 404));
+  if (!projects || projects.length === 0) {
+    return res.status(200).json({
+      success: true,
+      message: "No projects found.",
+      data: [],
+    });
   }
 
   const totalResults = result?.count[0]?.total || 0;
