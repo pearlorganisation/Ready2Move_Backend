@@ -3,8 +3,22 @@ import Property from "../../models/property/property.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
 
 export const getCityWithLocality = asyncHandler(async (req, res) => {
-  const projectData = await Project.find({}, "city locality").lean();
-  const propertyData = await Property.find({}, "city locality").lean();
+  const { limit } = req.query;
+  limit = limit ? Number(limit) : undefined;
+  const projectQuery = Project.find({}, "city locality").sort({
+    createdAt: -1,
+  });
+  const propertyQuery = Property.find({}, "city locality").sort({
+    createdAt: -1,
+  });
+
+  if (limit) {
+    projectQuery.limit(limit);
+    propertyQuery.limit(limit);
+  }
+
+  const projectData = await projectQuery.lean();
+  const propertyData = await propertyQuery.lean();
   const groupByCity = (data) => {
     const map = {};
 
