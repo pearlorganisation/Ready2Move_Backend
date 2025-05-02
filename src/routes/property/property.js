@@ -30,7 +30,7 @@ router
     handleUpload(upload.array("imageGallery", 8)),
     createProperty
   )
-  .get(getAllProperties); // no filtering, sorting and searching yet
+  .get(getAllProperties);
 
 router.route("/search").get(searchProperties); // Searching for home page.
 
