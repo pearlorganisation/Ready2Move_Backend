@@ -9,7 +9,9 @@ import { paginate } from "../../utils/pagination.js";
 export const getAllUsers = asyncHandler(async (req, res, next) => {
   const { page = 1, limit = 10, roles } = req.query; // /api/v1/users?roles=AGENT,BUILDER
 
-  let filter = {};
+  let filter = {
+    _id: { $ne: req.user._id }, // Exclude the current user.
+  };
 
   if (roles) {
     const roleArray = roles.split(",").map((role) => role.toUpperCase()); // Convert roles to UPPERCASE
@@ -133,5 +135,3 @@ export const refreshTokenController = asyncHandler(async (req, res, next) => {
     return next(new ApiError("Invalid refresh token", 401));
   }
 });
-
-
