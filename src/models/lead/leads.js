@@ -22,9 +22,8 @@ const leadSchema = new mongoose.Schema(
     },
     message: {
       type: String,
-      required: true,
       trim: true,
-      minlength: 10, // Minimum 10 characters
+      minlength: 1, // Minimum 1 characters
       maxlength: 500, // Maximum 500 characters
     },
     assignedTo: {
