@@ -38,6 +38,7 @@ import featuredRouter from "./src/routes/featuredProjectAndProperty/featuredProj
 import leadRouter from "./src/routes/lead/leads.js";
 import dashboardRouter from "./src/routes/dashboard/dashoard.js";
 import faqRouter from "./src/routes/faq/faq.js";
+import blogRouter from "./src/routes/blog/blog.js";
 import footerRouter from "./src/routes/footer/footer.js";
 
 app.get("/", (req, res) => {
@@ -55,6 +56,7 @@ app.use("/api/v1/properties", propertyRouter);
 app.use("/api/v1/featured", featuredRouter);
 app.use("/api/v1/leads", leadRouter);
 app.use("/api/v1/faqs", faqRouter);
+app.use("/api/v1/blogs", blogRouter);
 app.use("/api/v1/footer", footerRouter);
 
 app.use(errorHandler);
