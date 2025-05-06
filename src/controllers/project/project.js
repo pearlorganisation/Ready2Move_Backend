@@ -46,7 +46,7 @@ export const createProject = asyncHandler(async (req, res, next) => {
     pricePerSqFt:req.body.pricePerSqFt,
     bankOfApproval: req.body.bankOfApproval,
     imageGallery:imageGallaryResponse,
-    youtubeLink:req.body.youtubeLink
+    youtubeEmbedLink:req.body.youtubeEmbedLink
   });
 
   if (!project) {

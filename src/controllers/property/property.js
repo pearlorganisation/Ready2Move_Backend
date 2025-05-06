@@ -101,7 +101,7 @@ export const getAllProperties = asyncHandler(async (req, res, next) => {
     filter.service = { $regex: `^${service}$`, $options: "i" };
   }
   if (propertyType) {
-    filter.projectType = { $regex: `^${propertyType}$`, $options: "i" };
+    filter.property = { $regex: `^${propertyType}$`, $options: "i" };
   }
 
   if (priceRange > 0) {
