@@ -62,9 +62,13 @@ export const getAllLeads = asyncHandler(async (req, res, next) => {
 });
 
 export const updateLeadById = asyncHandler(async (req, res, next) => {
-  const lead = await Lead.findByIdAndUpdate(req.params.id, req.body, {
+
+  const {feedBack,status,assignedTo} = req.body
+  const lead = await Lead.findByIdAndUpdate(req.params.id,{
+    feedBack,status,assignedTo
+  } , {
     new: true,
-    runValidators: true,
+    runValidators: false,
   });
 
   if (!lead) {

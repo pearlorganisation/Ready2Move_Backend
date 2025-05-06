@@ -3,7 +3,6 @@ import multer from "multer";
 const handleUpload = (uploadMiddleware) => {
   return (req, res, next) => {
     uploadMiddleware(req, res, (err) => {
-      console.log("Multer error:", err);
       if (err instanceof multer.MulterError) {
         let message = "File upload error.";
 

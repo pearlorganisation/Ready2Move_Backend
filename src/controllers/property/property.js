@@ -92,6 +92,7 @@ export const getAllProperties = asyncHandler(async (req, res, next) => {
       { city: { $regex: q, $options: "i" } }, // Partial match
       { state: { $regex: q, $options: "i" } }, // Partial match
       { service: { $regex: q, $options: "i" } }, // Partial match
+      
       { property: { $regex: q, $options: "i" } }, // Partial match
       { reraNumber: { $regex: q, $options: "i" } }, // Partial match
       { apartmentName: { $regex: q, $options: "i" } }, // Partial match
@@ -219,7 +220,7 @@ export const updatePropertyBySlug = asyncHandler(async (req, res, next) => {
         update: {
           $set: {
             ...otherFields,
-            area: othesafeParse(otherFields.area),
+            area: safeParse(otherFields.area),
             bankOfApproval: safeParse(otherFields.bankOfApproval),
             aminities: safeParse(otherFields.aminities),
             otherFeatures: safeParse(otherFields.otherFeatures),

@@ -85,15 +85,15 @@ export const updateBannerById = asyncHandler(async (req, res, next) => {
 });
 
 export const deleteBannerbyId = asyncHandler(async (req, res, next) => {
-  const deletedBanner = await Banner.findByIdAndDelete(req.params.id);
+  const deletedBanner = await Banner.findByIdAndDelete(req?.params?.id);
 
   if (!deletedBanner) {
     return next(new ApiError("Banner not found", 404));
   }
 
-  // Delete images from Cloudinary
+  // Delete images from Cloudinary 
   if (deletedBanner?.bgImage)
-    await deleteFileFromCloudinary(deletedBanner.bgImage);
+    await deleteFileFromCloudinary(deletedBanner?.bgImage);
 
   return res
     .status(200)

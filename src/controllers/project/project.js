@@ -92,7 +92,7 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
     filter.projectType = { $regex: `^${projectType}$`, $options: "i" };
   }
 
-  // PRICE FILTERING
+
   if (priceRange) {
     const [min, max] = priceRange.split(",").map(Number);
     if (!isNaN(min) && !isNaN(max)) {
@@ -101,12 +101,12 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
     }
   }
 
-  // AREA FILTERING
+
   if (areaRange) {
     const [min, max] = areaRange.split(",").map(Number);
     if (!isNaN(min) && !isNaN(max)) {
-      filter["areaRange.max"] = { $gte: min }; // max area must be greater than or equal to min area
-      filter["areaRange.min"] = { $lte: max }; // min area must be less than or equal to max area
+      filter["areaRange.max"] = { $gte: min }; 
+      filter["areaRange.min"] = { $lte: max }; 
     }
   }
 
@@ -152,6 +152,7 @@ export const updateProjectBySlug = asyncHandler(async (req, res, next) => {
   let { deleteImages, ...otherFields } = req.body;
 
   const imageGallery = req.files;
+  console.log("fiels; ",req.files)
   let imageGalleryResponse = null;
 
   // Find the project first
@@ -179,6 +180,7 @@ export const updateProjectBySlug = asyncHandler(async (req, res, next) => {
       imageGallery,
       "Project"
     );
+    console.log("imageGalleryResponse: ",imageGalleryResponse)
   }
 
   // Step 3: Create bulkWrite operations
