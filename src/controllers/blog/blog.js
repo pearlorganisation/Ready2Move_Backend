@@ -1,5 +1,9 @@
-import { uploadFileToCloudinary } from "../../config/cloudinary.js";
+import {
+  deleteFileFromCloudinary,
+  uploadFileToCloudinary,
+} from "../../config/cloudinary.js";
 import Blog from "../../models/blog/blog.js";
+import ApiError from "../../utils/error/ApiError.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
 import { paginate } from "../../utils/pagination.js";
 
@@ -62,4 +66,81 @@ export const getAllBlogs = asyncHandler(async (req, res, next) => {
     pagination,
     data: blogs,
   });
+});
+
+export const getBlogBySlug = asyncHandler(async (req, res, next) => {
+  const blog = await Blog.findOne({ slug: req.params?.slug }).populate(
+    "author",
+    "name email role"
+  );
+
+  if (!blog) {
+    return next(new ApiError("Blog post not found", 404));
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: "Fetched blog post successfully",
+    data: blog,
+  });
+});
+
+export const updateBlogBySlug = asyncHandler(async (req, res, next) => {
+  const { slug } = req.params;
+  const thumbImage = req.file;
+
+  // Fetch the blog post to check for existing thumbImage
+  const existingBlog = await Blog.findOne({ slug });
+  if (!existingBlog) {
+    return next(new ApiError("Blog post not found", 404));
+  }
+
+  let thumbImageResponse = null;
+
+  // Delete the old thumbImage from Cloudinary if it exists and a new one is provided
+  if (thumbImage) {
+    thumbImageResponse = await uploadFileToCloudinary(thumbImage, "Blogs"); // Upload new thumbImage first
+    if (existingBlog.thumbImage) {
+      await deleteFileFromCloudinary(existingBlog.thumbImage); // If upload succeeds, delete the old thumbImage
+    }
+  }
+  // Prepare the data for update
+  const blogData = {
+    ...req.body,
+    thumbImage: thumbImageResponse ? thumbImageResponse[0] : undefined, // can't use null here as it set null in db if not required
+  };
+
+  // Find and update the blog post
+  const updatedBlog = await Blog.findOneAndUpdate({ slug }, blogData, {
+    new: true,
+    runValidators: true,
+  });
+
+  // Check if update was successful
+  if (!updatedBlog) {
+    return next(new ApiError("Blog post not found or update failed", 404));
+  }
+
+  // Send success response
+  return res.status(200).json({
+    success: true,
+    message: "Blog post updated successfully",
+    data: updatedBlog,
+  });
+});
+
+export const deleteBlogbyId = asyncHandler(async (req, res, next) => {
+  const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
+
+  if (!deletedBlog) {
+    return next(new ApiError("Blog post not found", 404));
+  }
+
+  // Delete images from Cloudinary
+  if (deletedBlog?.thumbImage)
+    await deleteFileFromCloudinary(deletedBlog.thumbImage);
+
+  return res
+    .status(200)
+    .json({ success: true, message: "Blog post deleted successfully" });
 });
