@@ -266,7 +266,6 @@ export const searchProjects = asyncHandler(async (req, res, next) => {
     parseInt(limit),
     { service, projectType }
   );
-  console.log("pipeline: ", JSON.stringify(pipline, null, 2));
   const [result] = await Project.aggregate(pipline);
   const projects = result?.data || [];
 

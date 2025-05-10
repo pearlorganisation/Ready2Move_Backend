@@ -8,7 +8,7 @@ const propertySchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true, trim: true },
     subTitle: { type: String },
     description: { type: String, required: true },
-    service: { type: String, enum: ["SELL", "RENT"], required: true }, // search for property
+    service: { type: String, enum: ["BUY", "RENT"], required: true }, // search for property
     property: {
       // search for property
       type: String,
