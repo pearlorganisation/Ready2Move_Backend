@@ -8,6 +8,7 @@ import {
   deleteBlogbyId,
   getAllBlogs,
   getBlogBySlug,
+  getRecentBlogs,
   updateBlogBySlug,
 } from "../../controllers/blog/blog.js";
 import { upload } from "../../middlewares/multer.js";
@@ -24,6 +25,8 @@ router
     createBlog
   )
   .get(getAllBlogs);
+
+router.route("/recent").get(getRecentBlogs); // By default 5 recent blog will be fetched
 
 router
   .route("/:slug")

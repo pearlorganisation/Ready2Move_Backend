@@ -144,3 +144,19 @@ export const deleteBlogbyId = asyncHandler(async (req, res, next) => {
     .status(200)
     .json({ success: true, message: "Blog post deleted successfully" });
 });
+
+export const getRecentBlogs = asyncHandler(async (req, res, next) => {
+  const { limit = 5 } = req.query; // Default limit to 5 if not provided
+
+  // Fetch recent blogs based on publication date
+  const recentBlogs = await Blog.find()
+    .populate("author", "name email")
+    .sort({ publishedAt: -1 }) // Sort by latest published
+    .limit(Number(limit)); // Limit number of results
+
+  return res.status(200).json({
+    success: true,
+    message: "Fetched recent blog posts successfully",
+    data: recentBlogs,
+  });
+});
