@@ -1,5 +1,8 @@
 import express from "express";
-import { authenticateToken } from "../../middlewares/authMiddleware.js";
+import {
+  authenticateToken,
+  verifyPermission,
+} from "../../middlewares/authMiddleware.js";
 import {
   createBlog,
   deleteBlogbyId,
@@ -8,19 +11,36 @@ import {
   updateBlogBySlug,
 } from "../../controllers/blog/blog.js";
 import { upload } from "../../middlewares/multer.js";
+import { USER_ROLES_ENUM } from "../../../constants.js";
 
 const router = express.Router();
 
 router
   .route("/")
-  .post(authenticateToken, upload.single("thumbImage"), createBlog) // who will create blog
+  .post(
+    authenticateToken,
+    verifyPermission([USER_ROLES_ENUM.ADMIN]),
+    upload.single("thumbImage"),
+    createBlog
+  )
   .get(getAllBlogs);
 
 router
   .route("/:slug")
-  .patch(authenticateToken, upload.single("thumbImage"), updateBlogBySlug) // who will create blog
+  .patch(
+    authenticateToken,
+    verifyPermission([USER_ROLES_ENUM.ADMIN]),
+    upload.single("thumbImage"),
+    updateBlogBySlug
+  )
   .get(getBlogBySlug);
 
-router.route("/:id").delete(authenticateToken, deleteBlogbyId);
+router
+  .route("/:id")
+  .delete(
+    authenticateToken,
+    verifyPermission([USER_ROLES_ENUM.ADMIN]),
+    deleteBlogbyId
+  );
 
 export default router;
