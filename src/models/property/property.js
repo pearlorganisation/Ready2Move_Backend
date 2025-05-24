@@ -55,7 +55,7 @@ const propertySchema = new mongoose.Schema(
       ref: "Feature",
       required: true,
     },
-    entranceFacing: {
+    entranceFacing: {                                                                                                                                                                                                                                         
       type: mongoose.Schema.Types.ObjectId,
       ref: "Feature",
       required: true,
