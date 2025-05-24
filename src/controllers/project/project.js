@@ -69,7 +69,7 @@ export const getProjectBySlug = asyncHandler(async (req, res, next) => {
   ]);
 
   if (!project) {
-    return next(new ApiError("University not found", 404));
+    return next(new ApiError("Project not found", 404));
   }
 
   return res.status(200).json({
