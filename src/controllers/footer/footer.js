@@ -3,7 +3,7 @@ import Property from "../../models/property/property.js";
 import { asyncHandler } from "../../utils/error/asyncHandler.js";
 
 export const getCityWithLocality = asyncHandler(async (req, res) => {
-  const { limit } = req.query;
+  let { limit } = req.query;
   limit = limit ? Number(limit) : undefined;
   const projectQuery = Project.find({}, "city locality").sort({
     createdAt: -1,

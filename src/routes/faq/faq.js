@@ -1,5 +1,10 @@
 import express from "express";
-import { createFaq } from "../../controllers/faq/faq.js";
+import {
+  createFaq,
+  deleteFaq,
+  getAllFaqs,
+  updateFaq,
+} from "../../controllers/faq/faq.js";
 import {
   authenticateToken,
   verifyPermission,
@@ -10,10 +15,19 @@ const router = express.Router();
 
 router
   .route("/")
-  .post(
+  .post(authenticateToken, verifyPermission([USER_ROLES_ENUM.ADMIN]), createFaq)
+  .get(getAllFaqs);
+
+router
+  .route("/:id")
+  .patch(
     authenticateToken,
     verifyPermission([USER_ROLES_ENUM.ADMIN]),
-    createFaq
+    updateFaq
+  )
+  .delete(
+    authenticateToken,
+    verifyPermission([USER_ROLES_ENUM.ADMIN]),
+    deleteFaq
   );
-
 export default router;
