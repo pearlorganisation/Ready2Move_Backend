@@ -73,6 +73,14 @@ export const getAllProjects = asyncHandler(async (req, res, next) => {
   } = req.query;
 
   const filter = {};
+
+  // ROLE-BASED FILTERING
+  if (req.user && req.user.role !== "ADMIN" && req.user.role !== "AGENT") {
+    // Authenticated non-admin (only for BUILDER) → only their own projects
+    filter.user = req.user._id;
+  }
+  // If no req.user (public) or admin, allow access to all projects
+
   if (q) {
     filter.$or = [
       { title: { $regex: q, $options: "i" } },

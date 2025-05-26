@@ -9,6 +9,7 @@ import {
 } from "../../controllers/property/property.js";
 import {
   authenticateToken,
+  optionalAuthenticateToken,
   verifyPermission,
 } from "../../middlewares/authMiddleware.js";
 import { USER_ROLES_ENUM } from "../../../constants.js";
@@ -30,7 +31,7 @@ router
     handleUpload(upload.array("imageGallery", 8)),
     createProperty
   )
-  .get(getAllProperties);
+  .get(optionalAuthenticateToken, getAllProperties);
 
 router.route("/search").get(searchProperties); // Searching for home page.
 

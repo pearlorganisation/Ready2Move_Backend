@@ -10,6 +10,7 @@ import {
 import { upload } from "../../middlewares/multer.js";
 import {
   authenticateToken,
+  optionalAuthenticateToken,
   verifyPermission,
 } from "../../middlewares/authMiddleware.js";
 import { USER_ROLES_ENUM } from "../../../constants.js";
@@ -19,7 +20,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(getAllProjects)
+  .get(optionalAuthenticateToken, getAllProjects)
   .post(
     authenticateToken,
     verifyPermission([USER_ROLES_ENUM.ADMIN, USER_ROLES_ENUM.BUILDER]),

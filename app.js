@@ -15,7 +15,12 @@ app.use(
             "http://localhost:3002",
             "http://localhost:3001",
           ]
-        : ["https://ready2-move.vercel.app", "https://ready2move.co.in"],
+        : [
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "https://ready2-move.vercel.app",
+            "https://ready2move.co.in",
+          ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"], // Specify allowed HTTP methods
     allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
     credentials: true,

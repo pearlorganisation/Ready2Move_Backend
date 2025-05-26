@@ -83,6 +83,12 @@ export const getAllProperties = asyncHandler(async (req, res, next) => {
     q,
   } = req.query;
   const filter = {};
+  if (req.user && req.user.role !== "ADMIN") {
+    // Authenticated non-admin (only for BUILDER, AGENT, USER) → only their own properties.
+    filter.user = req.user._id;
+  }
+  // If no req.user (public) or admin, allow access to all projects
+
   if (q) {
     filter.$or = [
       { title: { $regex: q, $options: "i" } },
