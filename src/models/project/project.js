@@ -11,7 +11,7 @@ const projectSchema = new mongoose.Schema(
     locality: { type: String, required: true },
     city: { type: String, required: true },
     state: { type: String, required: true },
-    service: { type: String, enum: ["BUY", "RENT"], required: true },
+    service: { type: String, enum: ["SELL", "RENT"], required: true },
     projectType: {
       // search for property
       type: String,

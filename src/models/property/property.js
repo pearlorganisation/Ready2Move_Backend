@@ -8,7 +8,7 @@ const propertySchema = new mongoose.Schema(
     slug: { type: String, required: true, unique: true, trim: true },
     subTitle: { type: String },
     description: { type: String, required: true },
-    service: { type: String, enum: ["BUY", "RENT"], required: true }, // search for property
+    service: { type: String, enum: ["SELL", "RENT"], required: true }, // search for property
     property: {
       // search for property
       type: String,
@@ -83,7 +83,7 @@ const propertySchema = new mongoose.Schema(
     brokerage: { type: Number, default: 0 },
     bankOfApproval: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     aminities: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
-    waterSource: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
+    waterSource: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     otherFeatures: [{ type: mongoose.Schema.Types.ObjectId, ref: "Feature" }],
     propertyFlooring: { type: mongoose.Schema.Types.ObjectId, ref: "Feature" },
     imageGallery: {
