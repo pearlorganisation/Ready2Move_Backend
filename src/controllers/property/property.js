@@ -161,10 +161,10 @@ export const getAllProperties = asyncHandler(async (req, res, next) => {
 });
 
 export const updatePropertyBySlug = asyncHandler(async (req, res, next) => {
-  let { deleteImages, ...otherFields } = req.body;
-  const imageGallery = req.files;
+  let { deleteImages,service, ...otherFields } = req.body;
+   const imageGallery = req.files;
   let imageGalleryResponse = null;
-
+  console.log("the image file is", req.body)
   const property = await Property.findOne({ slug: req.params?.slug });
 
   if (!property) {
