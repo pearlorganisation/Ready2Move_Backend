@@ -6,8 +6,8 @@ const propertySchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true, unique: true, trim: true },
     slug: { type: String, required: true, unique: true, trim: true },
-    subTitle: { type: String },
-    description: { type: String, required: true },
+    subTitle: { type: String, trim: true },
+    description: { type: String, required: true, trim: true },
     service: { type: String, enum: ["SELL", "RENT"], required: true }, // search for property
     property: {
       // search for property
@@ -20,11 +20,11 @@ const propertySchema = new mongoose.Schema(
       ref: "Feature",
       required: true,
     }, // search for property
-    apartmentName: { type: String, required: true }, // or society name
-    apartmentNo: { type: String, required: true }, // or society no.
-    locality: { type: String, required: true }, // on card
-    city: { type: String, required: true },
-    state: { type: String, required: true },
+    apartmentName: { type: String, required: true, trim: true }, // or society name
+    apartmentNo: { type: String, required: true, trim: true }, // or society no.
+    locality: { type: String, required: true, trim: true }, // on card
+    city: { type: String, required: true, trim: true },
+    state: { type: String, required: true, trim: true },
     area: [
       {
         name: {
@@ -40,11 +40,11 @@ const propertySchema = new mongoose.Schema(
         },
       },
     ],
-    reraNumber: { type: String, required: true },
-    reraPossessionDate: { type: Date, required: true },
-    noOfBedrooms: { type: Number, required: true },
-    noOfBathrooms: { type: Number, required: true },
-    noOfBalconies: { type: Number, required: true },
+    reraNumber: { type: String, required: true, trim: true },
+    reraPossessionDate: { type: Date, required: true, trim: true },
+    noOfBedrooms: { type: Number, required: true, trim: true },
+    noOfBathrooms: { type: Number, required: true, trim: true },
+    noOfBalconies: { type: Number, required: true, trim: true },
     parking: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Feature",

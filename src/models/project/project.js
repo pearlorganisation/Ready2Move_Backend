@@ -6,11 +6,11 @@ const projectSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     title: { type: String, required: true, unique: true, trim: true },
     slug: { type: String, required: true, unique: true, trim: true },
-    subTitle: { type: String },
-    description: { type: String, required: true },
-    locality: { type: String, required: true },
-    city: { type: String, required: true },
-    state: { type: String, required: true },
+    subTitle: { type: String, trim: true },
+    description: { type: String, required: true, trim: true },
+    locality: { type: String, required: true, trim: true },
+    city: { type: String, required: true, trim: true },
+    state: { type: String, required: true, trim: true },
     service: { type: String, enum: ["SELL", "RENT"], required: true },
     projectType: {
       // search for property
